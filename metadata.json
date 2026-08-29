@@ -1,0 +1,7 @@
+{
+  "name": "Tạo Đề Kiểm Tra",
+  "description": "Công cụ AI tạo bộ đề kiểm tra định kỳ chuẩn Bộ Giáo dục dành cho giáo viên Việt Nam bằng Gemini AI",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
+
