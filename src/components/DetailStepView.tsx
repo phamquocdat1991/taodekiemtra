@@ -1,6 +1,6 @@
 import React from "react";
 import { FullExamState, DetailGuideData } from "../types";
-import { Award, AlertTriangle, BookCheck, Sparkles } from "lucide-react";
+import { Award, AlertTriangle, BookCheck, Sparkles, Brain } from "lucide-react";
 
 interface DetailStepViewProps {
   config: FullExamState;
@@ -86,6 +86,21 @@ export const DetailStepView: React.FC<DetailStepViewProps> = ({
                 <strong className="text-stone-700 shrink-0 font-bold">• Kiến thức áp dụng:</strong>
                 <span className="text-stone-600 italic">{item.knowledgeUsed}</span>
               </div>
+
+              {/* Trap Analysis – Bẫy tư duy & Lỗ hổng nhận thức */}
+              {item.trapAnalysis && (
+                <div className="bg-violet-50 border border-violet-200 rounded-xl p-3.5 flex items-start gap-2.5 text-violet-900 mt-2">
+                  <Brain className="w-4 h-4 text-violet-500 shrink-0 mt-0.5" />
+                  <div>
+                    <span className="font-bold text-xs uppercase tracking-wider block text-violet-700 mb-1">
+                      ⚠️ Bẫy tư duy & Lỗ hổng nhận thức:
+                    </span>
+                    <span className="text-xs text-violet-800 leading-relaxed font-medium">
+                      {item.trapAnalysis}
+                    </span>
+                  </div>
+                </div>
+              )}
 
               {/* Common Mistakes */}
               {item.commonMistakes && (

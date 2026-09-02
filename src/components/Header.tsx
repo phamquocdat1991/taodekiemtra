@@ -1,11 +1,12 @@
 import React from "react";
-import { Lightbulb, Key, BookOpen, LogOut, Sparkles, ShieldCheck, Crown } from "lucide-react";
+import { Lightbulb, Key, BookOpen, LogOut, Sparkles, ShieldCheck, Crown, GraduationCap } from "lucide-react";
 
 interface HeaderProps {
   onOpenApiKeyModal: () => void;
   onOpenGuideModal: () => void;
   onResetSession: () => void;
   hasCustomKey: boolean;
+  onGoToStudentPortal: () => void;
 }
 
 export const Header: React.FC<HeaderProps> = ({
@@ -13,6 +14,7 @@ export const Header: React.FC<HeaderProps> = ({
   onOpenGuideModal,
   onResetSession,
   hasCustomKey,
+  onGoToStudentPortal,
 }) => {
   return (
     <header className="bg-white rounded-[28px] shadow-[0_2px_12px_rgba(67,24,5,0.04)] border border-[#EFE7DF] p-5 md:p-6 mb-5 transition-all">
@@ -71,7 +73,17 @@ export const Header: React.FC<HeaderProps> = ({
             className="inline-flex items-center gap-1.5 px-3 py-2 rounded-xl text-xs font-bold bg-[#FAF8F5] text-stone-700 border border-[#EFE7DF] hover:bg-stone-100 transition-all active:scale-95"
           >
             <BookOpen className="w-3.5 h-3.5 text-stone-500" />
-            <span>HƯỚNG DẪN</span>
+            <span>HUONG DAN</span>
+          </button>
+
+          {/* Student Portal Button */}
+          <button
+            onClick={onGoToStudentPortal}
+            className="inline-flex items-center gap-1.5 px-3 py-2 rounded-xl text-xs font-bold bg-gradient-to-r from-violet-600 to-purple-700 text-white border border-violet-400/30 hover:from-violet-500 hover:to-purple-600 transition-all active:scale-95 shadow-sm"
+            title="Hoc sinh vao phong thi bang ma PIN"
+          >
+            <GraduationCap className="w-3.5 h-3.5" />
+            <span>VAO PHONG THI</span>
           </button>
 
           <button

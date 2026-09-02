@@ -42,6 +42,14 @@ import { AnswerStepView } from "./components/AnswerStepView";
 import { DetailStepView } from "./components/DetailStepView";
 import { SummaryStepView } from "./components/SummaryStepView";
 
+// Phase 2: Online Exam Room
+import { ExamRoomCard } from "./components/ExamRoomCard";
+import { StudentPortal } from "./components/StudentPortal";
+import { OnlineExamRoom } from "./components/OnlineExamRoom";
+import { ClassroomDashboard } from "./components/ClassroomDashboard";
+import { createRoom, getRoom } from "./services/roomService";
+import { OnlineRoom } from "./types";
+
 // Modals
 import { ApiKeyModal } from "./components/ApiKeyModal";
 import { GuideModal } from "./components/GuideModal";
@@ -50,8 +58,18 @@ import { EditModal } from "./components/EditModal";
 
 export function App() {
   // Main State
-  const [viewMode, setViewMode] = useState<"config" | "workflow">("config");
+  const [viewMode, setViewMode] = useState<"config" | "workflow" | "student" | "exam">("config");
   const [config, setConfig] = useState<FullExamState>(defaultPresets[0].state);
+
+  // Phase 2: Online Room State
+  const [activeRoom, setActiveRoom] = useState<OnlineRoom | null>(null);
+  const [isRoomModalOpen, setIsRoomModalOpen] = useState(false);
+  const [isDashboardOpen, setIsDashboardOpen] = useState(false);
+  const [studentName, setStudentName] = useState("");
+  const [examRoom, setExamRoom] = useState<OnlineRoom | null>(null);
+
+  // URL PIN auto-detection
+  const urlPin = new URLSearchParams(window.location.search).get("pin") || "";
 
   // 5 Step Artifacts
   const [matrix, setMatrix] = useState<MatrixData | null>(null);
@@ -81,6 +99,10 @@ export function App() {
 
   useEffect(() => {
     setHasCustomKey(Boolean(getCustomApiKey()));
+    // If URL has ?pin=XXXXXX, auto-go to student portal
+    if (urlPin && urlPin.length === 6) {
+      setViewMode("student");
+    }
   }, []);
 
   // Validation
@@ -199,6 +221,29 @@ export function App() {
     } finally {
       setIsGenerating(false);
     }
+  };
+
+  // Phase 2 & 3: Create Online Room Handler
+  const handleCreateRoom = async () => {
+    if (!exam || !answers) return;
+    const pin = await createRoom(config, exam, answers);
+    const room = await getRoom(pin);
+    if (room) {
+      setActiveRoom(room);
+      setIsRoomModalOpen(true);
+    }
+  };
+
+  // Phase 2: Go to Student Portal
+  const handleGoToStudentPortal = () => {
+    setViewMode("student");
+  };
+
+  // Phase 2: Start exam from student portal
+  const handleStartExam = (room: OnlineRoom, name: string) => {
+    setExamRoom(room);
+    setStudentName(name);
+    setViewMode("exam");
   };
 
   // Start Manual Workflow
@@ -448,13 +493,34 @@ export function App() {
 
   return (
     <div className="min-h-screen bg-[#FAF8F5]/80 text-stone-800 font-sans antialiased pb-28">
-      {/* Top Header Card */}
-      <div className="max-w-[1020px] mx-auto pt-4 md:pt-6 px-3 sm:px-4">
+
+      {/* Phase 2: Student Portal View */}
+      {viewMode === "student" && (
+        <StudentPortal
+          initialPin={urlPin}
+          onBack={() => setViewMode("config")}
+          onStartExam={(room, name) => handleStartExam(room, name)}
+        />
+      )}
+
+      {/* Phase 2: Online Exam View */}
+      {viewMode === "exam" && examRoom && (
+        <OnlineExamRoom
+          room={examRoom}
+          studentName={studentName}
+          onFinish={() => setViewMode("student")}
+        />
+      )}
+
+      {/* Main Teacher App */}
+      {(viewMode === "config" || viewMode === "workflow") && (
+        <div className="max-w-[1020px] mx-auto pt-4 md:pt-6 px-3 sm:px-4">
         <Header
           onOpenApiKeyModal={() => setIsApiKeyModalOpen(true)}
           onOpenGuideModal={() => setIsGuideModalOpen(true)}
           onResetSession={handleResetSession}
           hasCustomKey={hasCustomKey}
+          onGoToStudentPortal={handleGoToStudentPortal}
         />
 
         {/* 1. CONFIGURATION VIEW */}
@@ -569,6 +635,7 @@ export function App() {
                 detail={detail}
                 onExportAllZip={handleExportAllZip}
                 onExportSingleDocx={handleExportSingleDocx}
+                onCreateRoom={handleCreateRoom}
                 onNewExam={() => {
                   setViewMode("config");
                   handleCancelAuto();
@@ -582,6 +649,27 @@ export function App() {
           </div>
         )}
       </div>
+      )} {/* End teacher wrapper div */}
+
+      {/* Phase 2: Exam Room Modal */}
+      {isRoomModalOpen && activeRoom && (
+        <ExamRoomCard
+          room={activeRoom}
+          onClose={() => {
+            setIsRoomModalOpen(false);
+            setActiveRoom(null);
+          }}
+          onOpenDashboard={() => setIsDashboardOpen(true)}
+        />
+      )}
+
+      {/* Phase 3: Classroom Dashboard Modal */}
+      {isDashboardOpen && activeRoom && (
+        <ClassroomDashboard
+          pin={activeRoom.pin}
+          onClose={() => setIsDashboardOpen(false)}
+        />
+      )}
 
       {/* Modals */}
       <ApiKeyModal

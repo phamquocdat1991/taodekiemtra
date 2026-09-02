@@ -7,7 +7,85 @@ import {
   Textbook,
   ExamDifficulty,
 } from "../types";
-import { Settings, AlertCircle, CheckCircle2, Sliders } from "lucide-react";
+import { Settings, AlertCircle, CheckCircle2, Sliders, Zap, Trophy, Flame, Sprout } from "lucide-react";
+
+// ─── Difficulty Preset Data ───────────────────────────────────────────────────
+interface DifficultyPreset {
+  id: ExamDifficulty;
+  label: string;
+  subLabel: string;
+  target: string;
+  icon: React.ReactNode;
+  nb: number;
+  th: number;
+  vd: number;
+  vdc: number;
+  bgClass: string;
+  activeBgClass: string;
+  borderClass: string;
+  activeBorderClass: string;
+  iconBgClass: string;
+  labelColorClass: string;
+}
+
+const DIFFICULTY_PRESETS: DifficultyPreset[] = [
+  {
+    id: "Dễ",
+    label: "Nền tảng",
+    subLabel: "Củng cố kiến thức",
+    target: "Mục tiêu 5 – 6đ",
+    icon: <Sprout className="w-5 h-5" />,
+    nb: 50, th: 35, vd: 15, vdc: 0,
+    bgClass: "bg-sky-50/60 hover:bg-sky-100/80",
+    activeBgClass: "bg-sky-100",
+    borderClass: "border-sky-200",
+    activeBorderClass: "border-sky-500",
+    iconBgClass: "bg-sky-500 text-white",
+    labelColorClass: "text-sky-700",
+  },
+  {
+    id: "Trung bình",
+    label: "Chuẩn",
+    subLabel: "Tốt nghiệp / Định kỳ",
+    target: "Mục tiêu 7 – 8đ",
+    icon: <Zap className="w-5 h-5" />,
+    nb: 40, th: 30, vd: 20, vdc: 10,
+    bgClass: "bg-emerald-50/60 hover:bg-emerald-100/80",
+    activeBgClass: "bg-emerald-100",
+    borderClass: "border-emerald-200",
+    activeBorderClass: "border-emerald-500",
+    iconBgClass: "bg-emerald-500 text-white",
+    labelColorClass: "text-emerald-700",
+  },
+  {
+    id: "Khá",
+    label: "Nâng cao",
+    subLabel: "Bứt phá / Khảo sát",
+    target: "Mục tiêu 8 – 9đ",
+    icon: <Flame className="w-5 h-5" />,
+    nb: 25, th: 30, vd: 30, vdc: 15,
+    bgClass: "bg-amber-50/60 hover:bg-amber-100/80",
+    activeBgClass: "bg-amber-100",
+    borderClass: "border-amber-200",
+    activeBorderClass: "border-amber-500",
+    iconBgClass: "bg-amber-500 text-white",
+    labelColorClass: "text-amber-700",
+  },
+  {
+    id: "Khó",
+    label: "Thử thách",
+    subLabel: "Phân hóa / HSG",
+    target: "Mục tiêu 9 – 10đ",
+    icon: <Trophy className="w-5 h-5" />,
+    nb: 15, th: 25, vd: 30, vdc: 30,
+    bgClass: "bg-rose-50/60 hover:bg-rose-100/80",
+    activeBgClass: "bg-rose-100",
+    borderClass: "border-rose-200",
+    activeBorderClass: "border-rose-500",
+    iconBgClass: "bg-rose-500 text-white",
+    labelColorClass: "text-rose-700",
+  },
+];
 
 interface GeneralConfigCardProps {
   general: GeneralConfig;
@@ -259,6 +337,83 @@ export const GeneralConfigCard: React.FC<GeneralConfigCardProps> = ({
             <option value="Khó">Khó (Đề khảo sát/chuyên/HSG)</option>
           </select>
         </div>
+      </div>
+
+      {/* ── Preset Cards: Chọn cấp độ bẫy tư duy ── */}
+      <div className="mb-5">
+        <div className="flex items-center gap-2 mb-3">
+          <Zap className="w-4 h-4 text-[#8F310C]" />
+          <h3 className="text-xs font-extrabold text-[#8F310C] uppercase tracking-wider">
+            Chọn nhanh cấp độ đề (Tự động điền % nhận thức)
+          </h3>
+        </div>
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-2.5">
+          {DIFFICULTY_PRESETS.map((preset) => {
+            const isActive = cognition.difficulty === preset.id;
+            return (
+              <button
+                key={preset.id}
+                type="button"
+                onClick={() =>
+                  onCognitionChange({
+                    nb: preset.nb,
+                    th: preset.th,
+                    vd: preset.vd,
+                    vdc: preset.vdc,
+                    difficulty: preset.id,
+                  })
+                }
+                className={`relative flex flex-col items-start gap-2 p-3.5 rounded-2xl border-2 text-left transition-all duration-200 active:scale-95 cursor-pointer ${
+                  isActive
+                    ? `${preset.activeBgClass} ${preset.activeBorderClass} shadow-md`
+                    : `${preset.bgClass} ${preset.borderClass} hover:shadow-sm`
+                }`}
+              >
+                {/* Active indicator */}
+                {isActive && (
+                  <span className="absolute top-2 right-2 w-2 h-2 rounded-full bg-current animate-pulse" style={{ color: "inherit" }}>
+                    <span className={`block w-2 h-2 rounded-full ${preset.iconBgClass.split(' ')[0]}`} />
+                  </span>
+                )}
+
+                {/* Icon */}
+                <div className={`w-8 h-8 rounded-xl flex items-center justify-center shrink-0 ${preset.iconBgClass}`}>
+                  {preset.icon}
+                </div>
+
+                {/* Labels */}
+                <div className="flex-1 min-w-0">
+                  <p className={`font-black text-sm leading-tight ${preset.labelColorClass}`}>
+                    {preset.label}
+                  </p>
+                  <p className="text-[11px] text-stone-500 font-medium leading-snug mt-0.5">
+                    {preset.subLabel}
+                  </p>
+                  <p className={`text-[10px] font-bold mt-1.5 ${preset.labelColorClass}`}>
+                    {preset.target}
+                  </p>
+                </div>
+
+                {/* NB/TH/VD/VDC mini badges */}
+                <div className="flex flex-wrap gap-1 w-full">
+                  {[
+                    { key: "NB", val: preset.nb, color: "text-blue-600 bg-blue-50" },
+                    { key: "TH", val: preset.th, color: "text-emerald-600 bg-emerald-50" },
+                    { key: "VD", val: preset.vd, color: "text-amber-600 bg-amber-50" },
+                    { key: "VDC", val: preset.vdc, color: "text-rose-600 bg-rose-50" },
+                  ].map((b) => (
+                    <span key={b.key} className={`text-[9px] font-bold px-1.5 py-0.5 rounded-md ${b.color}`}>
+                      {b.key}: {b.val}%
+                    </span>
+                  ))}
+                </div>
+              </button>
+            );
+          })}
+        </div>
+        <p className="text-[10px] text-stone-400 font-medium mt-2 pl-1">
+          💡 Bấm chọn một trong 4 cấp độ để tự động điền tỉ lệ % nhận thức bên dưới. Bạn vẫn có thể chỉnh tay sau đó.
+        </p>
       </div>
 
       {/* Section III: Mức độ nhận thức */}

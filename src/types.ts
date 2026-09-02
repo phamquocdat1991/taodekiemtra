@@ -205,6 +205,7 @@ export interface DetailGuideItem {
   answer: string;
   detailedSolution: string;
   knowledgeUsed: string;
+  trapAnalysis?: string;      // Bẫy tư duy và lỗ hổng nhận thức thường gặp
   commonMistakes?: string;
   rubric?: Array<{ criterion: string; points: number }>;
 }
@@ -239,3 +240,42 @@ export interface ConfigPreset {
   createdAt: string;
   config: FullExamState;
 }
+
+// ─── Phase 2: Online Exam Room ────────────────────────────────────────────────
+
+export interface OnlineRoom {
+  pin: string;
+  createdAt: number;           // timestamp ms
+  expiresAt: number;           // timestamp ms (createdAt + duration * 60000)
+  config: FullExamState;
+  exam: ExamData;
+  answers: AnswerData;
+}
+
+// student answers: { questionId -> answer string }
+export type StudentAnswerMap = Record<string, string>;
+
+export interface QuestionResult {
+  questionNumber: string | number;
+  questionExcerpt: string;
+  studentAnswer: string;
+  correctAnswer: string;
+  isCorrect: boolean;
+  points: number;
+  earnedPoints: number;
+}
+
+export interface ExamResult {
+  pin: string;
+  submittedAt: number;
+  totalPoints: number;
+  earnedPoints: number;
+  scorePercent: number;
+  partResults: Array<{
+    partTitle: string;
+    earnedPoints: number;
+    totalPoints: number;
+    questions: QuestionResult[];
+  }>;
+}
+

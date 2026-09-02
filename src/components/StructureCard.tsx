@@ -7,6 +7,110 @@ import {
 } from "../types";
 import { ListFilter, RotateCcw, AlertCircle, CheckCircle2 } from "lucide-react";
 
+// ─── Score Progress Bar Component ────────────────────────────────────────────
+interface ScoreProgressBarProps {
+  totalCount: number;
+  totalPercent: number;
+  totalPoints: number;
+  isValid: boolean;
+}
+
+const ScoreProgressBar: React.FC<ScoreProgressBarProps> = ({
+  totalCount,
+  totalPercent,
+  totalPoints,
+  isValid,
+}) => {
+  const pct = Math.min(totalPercent, 100);
+  const ptPct = Math.min((totalPoints / 10) * 100, 100);
+
+  return (
+    <div className={`mt-4 p-4 rounded-xl border-2 transition-all duration-300 ${
+      isValid
+        ? "bg-emerald-50/60 border-emerald-200"
+        : "bg-red-50/60 border-red-200 animate-pulse-once"
+    }`}>
+      {/* Header row */}
+      <div className="flex items-center justify-between mb-3">
+        <span className="text-xs font-extrabold text-stone-600 uppercase tracking-wide">
+          Kiểm tra cấu trúc điểm
+        </span>
+        <span className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-bold ${
+          isValid
+            ? "bg-emerald-100 text-emerald-700 border border-emerald-300"
+            : "bg-red-100 text-red-600 border border-red-300"
+        }`}>
+          {isValid
+            ? <><CheckCircle2 className="w-3.5 h-3.5" /> Hợp lệ ✓</>  
+            : <><AlertCircle className="w-3.5 h-3.5" /> Chưa đạt chuẩn</>}
+        </span>
+      </div>
+
+      {/* Tổng số câu */}
+      <div className="text-center mb-3">
+        <span className={`text-2xl font-black ${
+          isValid ? "text-emerald-700" : "text-red-600"
+        }`}>{totalCount}</span>
+        <span className="text-xs font-bold text-stone-500 ml-1">câu</span>
+      </div>
+
+      {/* Thanh điểm */}
+      <div className="space-y-2.5">
+        {/* Tỷ lệ % */}
+        <div>
+          <div className="flex justify-between items-center mb-1">
+            <span className="text-[11px] font-bold text-stone-500">Tỷ lệ (%)</span>
+            <span className={`text-[11px] font-black ${
+              totalPercent === 100 ? "text-emerald-600" : "text-red-500"
+            }`}>{totalPercent}% / 100%</span>
+          </div>
+          <div className="w-full h-2.5 rounded-full bg-stone-200 overflow-hidden">
+            <div
+              className={`h-full rounded-full transition-all duration-500 ${
+                totalPercent === 100
+                  ? "bg-gradient-to-r from-emerald-400 to-emerald-600"
+                  : totalPercent > 100
+                  ? "bg-gradient-to-r from-red-400 to-red-600"
+                  : "bg-gradient-to-r from-amber-400 to-orange-500"
+              }`}
+              style={{ width: `${pct}%` }}
+            />
+          </div>
+        </div>
+
+        {/* Tổng điểm */}
+        <div>
+          <div className="flex justify-between items-center mb-1">
+            <span className="text-[11px] font-bold text-stone-500">Tổng điểm</span>
+            <span className={`text-[11px] font-black ${
+              totalPoints === 10 ? "text-emerald-600" : "text-red-500"
+            }`}>{totalPoints}đ / 10đ</span>
+          </div>
+          <div className="w-full h-2.5 rounded-full bg-stone-200 overflow-hidden">
+            <div
+              className={`h-full rounded-full transition-all duration-500 ${
+                totalPoints === 10
+                  ? "bg-gradient-to-r from-emerald-400 to-emerald-600"
+                  : totalPoints > 10
+                  ? "bg-gradient-to-r from-red-400 to-red-600"
+                  : "bg-gradient-to-r from-amber-400 to-orange-500"
+              }`}
+              style={{ width: `${ptPct}%` }}
+            />
+          </div>
+        </div>
+      </div>
+
+      {!isValid && (
+        <p className="mt-2.5 text-[10px] text-red-600 font-semibold flex items-center gap-1">
+          <AlertCircle className="w-3 h-3 shrink-0" />
+          Tổng tỷ lệ phải đạt đúng 100% và tổng điểm phải đạt đúng 10.0đ.
+        </p>
+      )}
+    </div>
+  );
+};
+
 interface StructureCardProps {
   subject: string;
   structure: QuestionStructureState;
@@ -337,41 +441,13 @@ export const StructureCard: React.FC<StructureCardProps> = ({
             </table>
           </div>
 
-          {/* Bottom Summary Indicators */}
-          <div className="mt-4 pt-4 border-t border-[#EFE7DF] flex flex-wrap items-center justify-between gap-3 bg-[#FAF8F5] p-3.5 md:p-4 rounded-xl border border-[#EFE7DF]">
-            <span className="text-xs font-bold text-stone-600">
-              Tổng số câu:{" "}
-              <strong className="text-[#431805] text-sm font-black">
-                {std.multipleChoice.count + std.trueFalse.count + std.shortAnswer.count + std.essay.count} câu
-              </strong>
-            </span>
-            <div className="flex items-center gap-2.5">
-              <span
-                className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-xl text-xs font-bold ${
-                  stdTotalPercent === 100
-                    ? "bg-emerald-100 text-emerald-800 border border-emerald-200"
-                    : "bg-red-100 text-red-700 border border-red-200 animate-pulse"
-                }`}
-              >
-                {stdTotalPercent === 100 ? "✅" : "⚠️"} {stdTotalPercent}%
-              </span>
-              <span
-                className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-xl text-xs font-bold ${
-                  stdTotalPoints === 10.0
-                    ? "bg-emerald-100 text-emerald-800 border border-emerald-200"
-                    : "bg-red-100 text-red-700 border border-red-200 animate-pulse"
-                }`}
-              >
-                {stdTotalPoints === 10.0 ? "✅" : "⚠️"} {stdTotalPoints} Điểm
-              </span>
-            </div>
-          </div>
-          {!isStdValid && (
-            <p className="mt-2 text-xs text-red-600 font-semibold flex items-center gap-1.5">
-              <AlertCircle className="w-3.5 h-3.5 shrink-0" />
-              Tổng tỷ lệ phải đạt 100% và tổng điểm phải đạt 10.0 điểm.
-            </p>
-          )}
+          {/* Score Progress Bar – Standard */}
+          <ScoreProgressBar
+            totalCount={std.multipleChoice.count + std.trueFalse.count + std.shortAnswer.count + std.essay.count}
+            totalPercent={stdTotalPercent}
+            totalPoints={stdTotalPoints}
+            isValid={isStdValid}
+          />
         </div>
       )}
 
@@ -541,35 +617,13 @@ export const StructureCard: React.FC<StructureCardProps> = ({
             </table>
           </div>
 
-          {/* Language Summary Indicators */}
-          <div className="mt-4 pt-4 border-t border-[#EFE7DF] flex flex-wrap items-center justify-between gap-3 bg-[#FAF8F5] p-3.5 md:p-4 rounded-xl border border-[#EFE7DF]">
-            <span className="text-xs font-bold text-stone-600">
-              Tổng số câu:{" "}
-              <strong className="text-[#431805] text-sm font-black">
-                {lang.listening.count + lang.languageFocus.count + lang.reading.count + lang.writing.count} câu
-              </strong>
-            </span>
-            <div className="flex items-center gap-2.5">
-              <span
-                className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-xl text-xs font-bold ${
-                  langTotalPercent === 100
-                    ? "bg-emerald-100 text-emerald-800 border border-emerald-200"
-                    : "bg-red-100 text-red-700 border border-red-200 animate-pulse"
-                }`}
-              >
-                {langTotalPercent === 100 ? "✅" : "⚠️"} {langTotalPercent}%
-              </span>
-              <span
-                className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-xl text-xs font-bold ${
-                  langTotalPoints === 10.0
-                    ? "bg-emerald-100 text-emerald-800 border border-emerald-200"
-                    : "bg-red-100 text-red-700 border border-red-200 animate-pulse"
-                }`}
-              >
-                {langTotalPoints === 10.0 ? "✅" : "⚠️"} {langTotalPoints} Điểm
-              </span>
-            </div>
-          </div>
+          {/* Score Progress Bar – Language */}
+          <ScoreProgressBar
+            totalCount={lang.listening.count + lang.languageFocus.count + lang.reading.count + lang.writing.count}
+            totalPercent={langTotalPercent}
+            totalPoints={langTotalPoints}
+            isValid={isLangValid}
+          />
         </div>
       )}
 

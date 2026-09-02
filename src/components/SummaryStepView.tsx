@@ -18,6 +18,9 @@ import {
   ArrowRight,
   Eye,
   RotateCcw,
+  Monitor,
+  Users,
+  QrCode,
 } from "lucide-react";
 import { MatrixStepView } from "./MatrixStepView";
 import { SpecStepView } from "./SpecStepView";
@@ -36,6 +39,7 @@ interface SummaryStepViewProps {
   onExportSingleDocx: (step: WorkflowStep) => void;
   onNewExam: () => void;
   onJumpToStep: (step: WorkflowStep) => void;
+  onCreateRoom: () => void;
 }
 
 export const SummaryStepView: React.FC<SummaryStepViewProps> = ({
@@ -49,6 +53,7 @@ export const SummaryStepView: React.FC<SummaryStepViewProps> = ({
   onExportSingleDocx,
   onNewExam,
   onJumpToStep,
+  onCreateRoom,
 }) => {
   const [activePreviewTab, setActivePreviewTab] = useState<WorkflowStep>(3); // default preview Exam
 
@@ -77,6 +82,18 @@ export const SummaryStepView: React.FC<SummaryStepViewProps> = ({
               <Archive className="w-4 h-4 text-[#F5730B]" />
               <span>TẢI TRỌN BỘ 5 TỆP (.ZIP)</span>
             </button>
+
+            {/* ── Online Exam Room Button ── */}
+            {exam && answers && (
+              <button
+                type="button"
+                onClick={onCreateRoom}
+                className="inline-flex items-center justify-center gap-2 px-5 py-3 rounded-xl bg-gradient-to-r from-violet-600 to-purple-700 hover:from-violet-500 hover:to-purple-600 text-white font-black text-xs md:text-sm transition-all shadow-lg shadow-purple-900/40 active:scale-95 cursor-pointer border border-violet-400/30"
+              >
+                <Monitor className="w-4 h-4" />
+                <span>TẠO PHÒNG THI TRỰC TUYẾN</span>
+              </button>
+            )}
 
             <button
               type="button"
