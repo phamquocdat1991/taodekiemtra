@@ -694,7 +694,9 @@ export function generateSmartAnswers(
       items: part.questions.map((q) => {
         if (q.type === "multipleChoice") {
           return {
+            questionId: q.id,
             questionNumber: `Câu ${q.questionNumber}`,
+            correctAnswer: "A",
             solutionSummary: "Đáp án đúng: A",
             points: q.points,
             note: "Mỗi đáp án đúng được trọn điểm.",
@@ -702,7 +704,9 @@ export function generateSmartAnswers(
         }
         if (q.type === "trueFalse") {
           return {
+            questionId: q.id,
             questionNumber: `Câu ${q.questionNumber}`,
+            correctAnswer: { a: "Đúng", b: "Đúng", c: "Sai", d: "Đúng" },
             solutionSummary: "a) Đúng | b) Đúng | c) Sai | d) Đúng",
             points: q.points,
             note: "Đúng 1 ý: 0.1đ | Đúng 2 ý: 0.25đ | Đúng 3 ý: 0.5đ | Đúng 4 ý: 1.0đ",
@@ -710,13 +714,16 @@ export function generateSmartAnswers(
         }
         if (q.type === "shortAnswer") {
           return {
+            questionId: q.id,
             questionNumber: `Câu ${q.questionNumber}`,
+            correctAnswer: q.content.includes("bờ biển") ? "1024" : "16",
             solutionSummary: "Đáp số: 16 (triệu đồng) / 1024 (mét)",
             points: q.points,
             note: "Học sinh điền đúng số nguyên hoặc làm tròn theo yêu cầu.",
           };
         }
         return {
+          questionId: q.id,
           questionNumber: `Câu ${q.questionNumber}`,
           solutionSummary: "Đáp án đạt chuẩn theo barem: Nêu đúng luận điểm, dẫn chứng thuyết phục và lập luận chặt chẽ.",
           points: q.points,
@@ -737,6 +744,7 @@ export function generateSmartDetailGuide(
   exam.parts.forEach((part) => {
     part.questions.forEach((q) => {
       items.push({
+        questionId: q.id,
         questionNumber: `Câu ${q.questionNumber} (${part.partTitle.split(".")[0]})`,
         questionExcerpt: q.content.length > 120 ? q.content.slice(0, 120) + "..." : q.content,
         answer: q.type === "multipleChoice" ? "Phương án A" : q.type === "trueFalse" ? "a) Đ, b) Đ, c) S, d) Đ" : "Lời giải chi tiết chuẩn quy định",

@@ -20,7 +20,7 @@ export const ExamStepView: React.FC<ExamStepViewProps> = ({
   }
 
   return (
-    <div className="bg-white rounded-2xl shadow-[0_2px_8px_rgba(67,24,5,0.03)] border border-[#EFE7DF] border-l-4 border-l-[#F5730B] p-5 md:p-8 font-serif leading-relaxed transition-all">
+    <div className="bg-white rounded-2xl shadow-[0_2px_8px_rgba(7,26,51,0.03)] border border-[#e2e8f0] border-l-4 border-l-[#f2a900] p-5 md:p-8 font-serif leading-relaxed transition-all">
       {/* Official Exam Paper Header */}
       <div className="border-b-2 border-stone-800 pb-5 mb-8">
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4 pb-3">
@@ -29,7 +29,7 @@ export const ExamStepView: React.FC<ExamStepViewProps> = ({
             <p className="font-bold text-xs uppercase tracking-wider text-stone-800">
               {config.general.department || "SỞ GIÁO DỤC VÀ ĐÀO TẠO"}
             </p>
-            <p className="font-extrabold text-sm uppercase tracking-wide text-[#431805]">
+            <p className="font-extrabold text-sm uppercase tracking-wide text-[#071a33]">
               {config.general.schoolName || "TRƯỜNG THPT CHU VĂN AN"}
             </p>
             <p className="text-xs font-medium text-stone-600 mt-1">
@@ -39,14 +39,14 @@ export const ExamStepView: React.FC<ExamStepViewProps> = ({
 
           {/* Right Column */}
           <div className="text-center md:text-right font-sans">
-            <p className="font-black text-sm uppercase tracking-wide text-[#8F310C]">
+            <p className="font-black text-sm uppercase tracking-wide text-[#164e7a]">
               {exam.header.examTitle || "ĐỀ KIỂM TRA ĐỊNH KỲ CHÍNH THỨC"}
             </p>
             <p className="text-xs font-bold text-stone-800 mt-0.5">
               NĂM HỌC: {exam.header.schoolYear || "2025 - 2026"}
             </p>
             <p className="text-xs text-stone-700">
-              Môn: <strong className="text-[#431805]">{config.general.subject} – {config.general.grade}</strong>
+              Môn: <strong className="text-[#071a33]">{config.general.subject} – {config.general.grade}</strong>
             </p>
             <p className="text-xs text-stone-600 italic">
               Thời gian làm bài: <strong>{config.general.duration} phút</strong> (không kể thời gian giao đề)
@@ -70,8 +70,8 @@ export const ExamStepView: React.FC<ExamStepViewProps> = ({
         {exam.parts.map((part, pIdx) => (
           <div key={pIdx} className="space-y-4">
             {/* Part Title */}
-            <div className="bg-[#FAF8F5] p-3.5 rounded-xl border-l-4 border-l-[#F5730B] border border-[#EFE7DF]">
-              <h3 className="font-bold text-sm md:text-base text-[#431805] uppercase tracking-wide font-sans">
+            <div className="bg-[#f8fafc] p-3.5 rounded-xl border-l-4 border-l-[#f2a900] border border-[#e2e8f0]">
+              <h3 className="font-bold text-sm md:text-base text-[#071a33] uppercase tracking-wide font-sans">
                 {part.partTitle}
               </h3>
               {part.description && (
@@ -84,7 +84,7 @@ export const ExamStepView: React.FC<ExamStepViewProps> = ({
             {/* Reading Passage if any */}
             {part.passage && (
               <div className="p-4 rounded-xl bg-orange-50/40 border border-orange-200 text-xs md:text-sm italic text-stone-800 leading-relaxed font-sans">
-                <div className="font-bold not-italic text-[#8F310C] mb-1 flex items-center gap-1.5">
+                <div className="font-bold not-italic text-[#164e7a] mb-1 flex items-center gap-1.5">
                   <FileText className="w-3.5 h-3.5" /> Đọc đoạn trích ngữ liệu sau và trả lời các câu hỏi:
                 </div>
                 {part.passage}
@@ -96,7 +96,7 @@ export const ExamStepView: React.FC<ExamStepViewProps> = ({
               {part.questions.map((q) => (
                 <div key={q.id || q.questionNumber} className="text-xs md:text-sm pl-2">
                   <div className="flex items-start gap-1.5 text-stone-900 font-sans leading-relaxed">
-                    <strong className="text-[#8F310C] shrink-0 font-bold">
+                    <strong className="text-[#164e7a] shrink-0 font-bold">
                       Câu {q.questionNumber}:
                     </strong>
                     <span>
@@ -113,7 +113,7 @@ export const ExamStepView: React.FC<ExamStepViewProps> = ({
                       {q.options.map((opt) => (
                         <div
                           key={opt.key}
-                          className="flex items-start gap-2 p-2 rounded-lg hover:bg-stone-50 border border-transparent hover:border-[#EFE7DF] transition-colors"
+                          className="flex items-start gap-2 p-2 rounded-lg hover:bg-stone-50 border border-transparent hover:border-[#e2e8f0] transition-colors"
                         >
                           <span className="w-5 h-5 rounded-full bg-stone-200 text-stone-800 flex items-center justify-center font-bold text-xs shrink-0">
                             {opt.key}
@@ -130,10 +130,10 @@ export const ExamStepView: React.FC<ExamStepViewProps> = ({
                       {q.subQuestions.map((sub, sIdx) => (
                         <div
                           key={sIdx}
-                          className="flex items-start justify-between gap-4 p-2.5 rounded-lg bg-[#FAF8F5] border border-[#EFE7DF] text-xs md:text-sm"
+                          className="flex items-start justify-between gap-4 p-2.5 rounded-lg bg-[#f8fafc] border border-[#e2e8f0] text-xs md:text-sm"
                         >
                           <div className="flex items-start gap-2">
-                            <span className="font-bold text-[#8F310C] shrink-0">
+                            <span className="font-bold text-[#164e7a] shrink-0">
                               {sub.label}
                             </span>
                             <span className="text-stone-800 font-medium">{sub.text}</span>

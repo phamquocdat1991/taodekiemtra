@@ -20,60 +20,60 @@ export const SpecStepView: React.FC<SpecStepViewProps> = ({
   }
 
   return (
-    <div className="bg-white rounded-2xl shadow-[0_2px_8px_rgba(67,24,5,0.03)] border border-[#EFE7DF] border-l-4 border-l-[#F5730B] p-5 md:p-8 transition-all">
+    <div className="bg-white rounded-2xl shadow-[0_2px_8px_rgba(7,26,51,0.03)] border border-[#e2e8f0] border-l-4 border-l-[#f2a900] p-5 md:p-8 transition-all">
       {/* Official Header */}
-      <div className="border-b border-[#EFE7DF] pb-5 mb-5">
+      <div className="border-b border-[#e2e8f0] pb-5 mb-5">
         <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 text-xs font-bold text-stone-600 uppercase">
           <div>
             <p className="text-stone-800 font-extrabold">{config.general.department || "SỞ GIÁO DỤC VÀ ĐÀO TẠO"}</p>
             <p className="text-stone-500 font-medium">{config.general.schoolName || "TRƯỜNG THPT CHU VĂN AN"}</p>
           </div>
           <div className="text-left md:text-right">
-            <p className="text-[#8F310C] font-extrabold">CỘNG HÒA XÃ HỘI CHỦ NGHĨA VIỆT NAM</p>
+            <p className="text-[#164e7a] font-extrabold">CỘNG HÒA XÃ HỘI CHỦ NGHĨA VIỆT NAM</p>
             <p className="text-stone-500 font-normal italic">Độc lập - Tự do - Hạnh phúc</p>
           </div>
         </div>
 
         <div className="text-center mt-5">
-          <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold bg-orange-100 text-[#8F310C] mb-2 border border-orange-200">
+          <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold bg-orange-100 text-[#164e7a] mb-2 border border-orange-200">
             <Award className="w-3.5 h-3.5" /> PHỤ LỤC 2 (CHUẨN BỘ GD&ĐT)
           </span>
-          <h2 className="text-lg md:text-2xl font-black text-[#431805] uppercase tracking-wide">
+          <h2 className="text-lg md:text-2xl font-black text-[#071a33] uppercase tracking-wide">
             BẢN ĐẶC TẢ ĐỀ KIỂM TRA ĐỊNH KÌ
           </h2>
           <p className="text-xs md:text-sm text-stone-600 mt-1 font-medium">
-            Môn: <span className="font-bold text-[#8F310C]">{config.general.subject}</span> – {config.general.grade} | Thời lượng: <span className="font-bold">{config.general.duration} phút</span>
+            Môn: <span className="font-bold text-[#164e7a]">{config.general.subject}</span> – {config.general.grade} | Thời lượng: <span className="font-bold">{config.general.duration} phút</span>
           </p>
         </div>
       </div>
 
       {/* Specification Table */}
-      <div className="overflow-x-auto rounded-xl border border-[#EFE7DF] shadow-2xs">
+      <div className="overflow-x-auto rounded-xl border border-[#e2e8f0] shadow-2xs">
         <table className="w-full text-left text-xs md:text-sm border-collapse">
           <thead>
-            <tr className="bg-[#FAF8F5] text-[#431805] border-b border-[#EFE7DF] font-bold">
-              <th className="p-3 text-center border-r border-[#EFE7DF] w-20">Câu số</th>
-              <th className="p-3 border-r border-[#EFE7DF] min-w-[180px]">Nội dung / Đơn vị kiến thức</th>
-              <th className="p-3 border-r border-[#EFE7DF] min-w-[280px]">Yêu cầu cần đạt (GDPT 2018)</th>
-              <th className="p-3 text-center border-r border-[#EFE7DF] w-28">Mức độ</th>
-              <th className="p-3 text-center border-r border-[#EFE7DF] w-24">TG (phút)</th>
+            <tr className="bg-[#f8fafc] text-[#071a33] border-b border-[#e2e8f0] font-bold">
+              <th className="p-3 text-center border-r border-[#e2e8f0] w-20">Câu số</th>
+              <th className="p-3 border-r border-[#e2e8f0] min-w-[180px]">Nội dung / Đơn vị kiến thức</th>
+              <th className="p-3 border-r border-[#e2e8f0] min-w-[280px]">Yêu cầu cần đạt (GDPT 2018)</th>
+              <th className="p-3 text-center border-r border-[#e2e8f0] w-28">Mức độ</th>
+              <th className="p-3 text-center border-r border-[#e2e8f0] w-24">TG (phút)</th>
               <th className="p-3 text-center w-24">Điểm</th>
             </tr>
           </thead>
-          <tbody className="divide-y divide-[#EFE7DF]">
+          <tbody className="divide-y divide-[#e2e8f0]">
             {spec.rows.map((row, idx) => (
               <tr key={idx} className="hover:bg-orange-50/30 transition-colors">
-                <td className="p-3 text-center font-black text-[#8F310C] border-r border-[#EFE7DF] bg-orange-50/20">
+                <td className="p-3 text-center font-black text-[#164e7a] border-r border-[#e2e8f0] bg-orange-50/20">
                   {row.questionNumber}
                 </td>
-                <td className="p-3 border-r border-[#EFE7DF]">
-                  <div className="font-bold text-[#431805]">{row.topic}</div>
+                <td className="p-3 border-r border-[#e2e8f0]">
+                  <div className="font-bold text-[#071a33]">{row.topic}</div>
                   <div className="text-stone-600 text-xs mt-0.5">{row.knowledgeUnit}</div>
                 </td>
-                <td className="p-3 text-stone-700 leading-relaxed border-r border-[#EFE7DF] font-medium">
+                <td className="p-3 text-stone-700 leading-relaxed border-r border-[#e2e8f0] font-medium">
                   {row.objective}
                 </td>
-                <td className="p-3 text-center border-r border-[#EFE7DF]">
+                <td className="p-3 text-center border-r border-[#e2e8f0]">
                   <span
                     className={`inline-block px-2 py-1 rounded-md text-xs font-bold ${
                       row.level === "Nhận biết"
@@ -88,10 +88,10 @@ export const SpecStepView: React.FC<SpecStepViewProps> = ({
                     {row.level}
                   </span>
                 </td>
-                <td className="p-3 text-center font-semibold text-stone-600 border-r border-[#EFE7DF]">
+                <td className="p-3 text-center font-semibold text-stone-600 border-r border-[#e2e8f0]">
                   {row.estimatedTime}p
                 </td>
-                <td className="p-3 text-center font-black text-[#8F310C]">
+                <td className="p-3 text-center font-black text-[#164e7a]">
                   {row.points}đ
                 </td>
               </tr>
@@ -101,14 +101,14 @@ export const SpecStepView: React.FC<SpecStepViewProps> = ({
       </div>
 
       {/* Specification Footnotes */}
-      <div className="mt-5 pt-4 border-t border-[#EFE7DF] flex flex-wrap items-center justify-between text-xs text-stone-600 gap-3">
+      <div className="mt-5 pt-4 border-t border-[#e2e8f0] flex flex-wrap items-center justify-between text-xs text-stone-600 gap-3">
         <div className="flex items-center gap-2 font-medium">
-          <Clock className="w-4 h-4 text-[#F5730B]" />
+          <Clock className="w-4 h-4 text-[#f2a900]" />
           <span>Tổng thời gian ước tính: <strong>{spec.totalTime || config.general.duration} phút</strong></span>
         </div>
         <div className="flex items-center gap-2 font-medium">
           <CheckCircle2 className="w-4 h-4 text-emerald-600" />
-          <span>Tổng điểm bản đặc tả: <strong className="text-[#8F310C]">10,0 điểm</strong></span>
+          <span>Tổng điểm bản đặc tả: <strong className="text-[#164e7a]">10,0 điểm</strong></span>
         </div>
       </div>
     </div>

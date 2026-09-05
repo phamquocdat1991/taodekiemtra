@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useRef } from "react";
+import { QRCodeSVG } from "qrcode.react";
 import { OnlineRoom } from "../types";
-import { deleteRoom } from "../services/roomService";
+import { closeRoom } from "../services/roomService";
 import {
   Clock,
   Copy,
@@ -19,19 +20,11 @@ interface ExamRoomCardProps {
   onOpenDashboard: () => void;
 }
 
-// Simple inline QR code using a public API (no extra deps)
 function QRCodeDisplay({ value }: { value: string }) {
-  const encoded = encodeURIComponent(value);
-  const src = `https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=${encoded}&bgcolor=1e1b4b&color=ffffff&qzone=1`;
   return (
-    <img
-      src={src}
-      alt="QR Code phong thi"
-      className="w-40 h-40 rounded-2xl shadow-lg"
-      onError={(e) => {
-        (e.target as HTMLImageElement).style.display = "none";
-      }}
-    />
+    <div role="img" aria-label="Mã QR vào phòng thi" className="rounded-2xl bg-white p-3 shadow-lg">
+      <QRCodeSVG value={value} size={136} bgColor="#ffffff" fgColor="#071a33" level="M" />
+    </div>
   );
 }
 
@@ -39,6 +32,8 @@ export const ExamRoomCard: React.FC<ExamRoomCardProps> = ({ room, onClose, onOpe
   const [copied, setCopied] = useState<"pin" | "link" | null>(null);
   const [timeLeft, setTimeLeft] = useState<number>(0);
   const [isExpired, setIsExpired] = useState(false);
+  const [roomError, setRoomError] = useState("");
+  const [isClosing, setIsClosing] = useState(false);
   const timerRef = useRef<any>(null);
 
   const appUrl = window.location.href.split("?")[0];
@@ -79,16 +74,25 @@ export const ExamRoomCard: React.FC<ExamRoomCardProps> = ({ room, onClose, onOpe
     setTimeout(() => setCopied(null), 2000);
   };
 
-  const handleClose = () => {
-    deleteRoom(room.pin);
-    onClose();
+  const handleClose = async () => {
+    if (!window.confirm("Đóng phòng thi? Học sinh mới sẽ không thể tham gia, nhưng kết quả đã nộp vẫn được lưu.")) return;
+    setIsClosing(true);
+    setRoomError("");
+    try {
+      await closeRoom(room.pin);
+      onClose();
+    } catch (cause) {
+      setRoomError(cause instanceof Error ? cause.message : "Không thể đóng phòng thi.");
+    } finally {
+      setIsClosing(false);
+    }
   };
 
   const pctLeft = timeLeft / ((room.expiresAt - room.createdAt)) * 100;
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm p-4">
-      <div className="w-full max-w-lg bg-gradient-to-br from-[#1e1b4b] via-[#312e81] to-[#4c1d95] rounded-3xl shadow-2xl border border-white/10 overflow-hidden">
+      <div className="w-full max-w-lg overflow-hidden rounded-3xl border border-white/10 bg-gradient-to-br from-[#071a33] via-[#0c3152] to-[#06172d] shadow-2xl">
         {/* Header */}
         <div className="flex items-center justify-between p-5 pb-0">
           <div className="flex items-center gap-2">
@@ -96,12 +100,13 @@ export const ExamRoomCard: React.FC<ExamRoomCardProps> = ({ room, onClose, onOpe
               <Users className="w-5 h-5 text-white" />
             </div>
             <div>
-              <p className="text-white/60 text-xs font-bold uppercase tracking-wider">Phong Thi Truc Tuyen</p>
+              <p className="text-xs font-bold uppercase tracking-wider text-white/60">Phòng thi trực tuyến</p>
               <p className="text-white font-black text-sm">{room.config.general.subject} – {room.config.general.grade}</p>
             </div>
           </div>
           <button
             onClick={onClose}
+            aria-label="Đóng cửa sổ thông tin phòng"
             className="w-8 h-8 rounded-xl bg-white/10 hover:bg-white/20 flex items-center justify-center text-white transition-all"
           >
             <X className="w-4 h-4" />
@@ -110,13 +115,14 @@ export const ExamRoomCard: React.FC<ExamRoomCardProps> = ({ room, onClose, onOpe
 
         {/* PIN */}
         <div className="flex flex-col items-center py-6 px-5">
-          <p className="text-white/50 text-xs font-bold uppercase tracking-widest mb-2">Ma PIN phong thi</p>
+          <p className="mb-2 text-xs font-bold uppercase tracking-widest text-white/50">Mã PIN phòng thi</p>
           <div className="flex items-center gap-3">
             <span className="font-mono font-black text-5xl md:text-6xl text-white tracking-[0.3em] select-all">
               {room.pin}
             </span>
             <button
               onClick={handleCopyPin}
+              aria-label="Sao chép mã PIN"
               className="flex flex-col items-center gap-1 p-2.5 rounded-xl bg-white/10 hover:bg-white/20 text-white transition-all active:scale-95"
             >
               {copied === "pin" ? (
@@ -124,7 +130,7 @@ export const ExamRoomCard: React.FC<ExamRoomCardProps> = ({ room, onClose, onOpe
               ) : (
                 <Copy className="w-5 h-5" />
               )}
-              <span className="text-[9px] font-bold">{copied === "pin" ? "Đa copy" : "COPY"}</span>
+              <span className="text-[9px] font-bold">{copied === "pin" ? "Đã chép" : "CHÉP"}</span>
             </button>
           </div>
 
@@ -132,7 +138,7 @@ export const ExamRoomCard: React.FC<ExamRoomCardProps> = ({ room, onClose, onOpe
           <div className={`mt-4 flex items-center gap-2 px-4 py-2 rounded-full ${isExpired ? "bg-red-500/30 text-red-300" : timeLeft < 300000 ? "bg-amber-500/30 text-amber-300" : "bg-white/10 text-white/70"}`}>
             <Clock className="w-4 h-4" />
             <span className="font-mono font-bold text-sm">
-              {isExpired ? "Het han" : `Con lai: ${formatTime(timeLeft)}`}
+              {isExpired ? "Hết hạn" : `Còn lại: ${formatTime(timeLeft)}`}
             </span>
           </div>
 
@@ -150,7 +156,7 @@ export const ExamRoomCard: React.FC<ExamRoomCardProps> = ({ room, onClose, onOpe
           <div className="flex flex-col items-center gap-2">
             <QRCodeDisplay value={studentLink} />
             <p className="text-white/40 text-[10px] font-bold flex items-center gap-1">
-              <QrCode className="w-3 h-3" /> Hoc sinh quet ma QR
+              <QrCode className="h-3 w-3" /> Học sinh quét mã QR
             </p>
           </div>
 
@@ -158,18 +164,18 @@ export const ExamRoomCard: React.FC<ExamRoomCardProps> = ({ room, onClose, onOpe
             {/* Exam info */}
             <div className="bg-white/5 rounded-2xl p-3.5 space-y-2">
               <div className="flex justify-between text-xs">
-                <span className="text-white/50 font-medium">Thoi gian thi</span>
-                <span className="text-white font-bold">{room.config.general.duration} phut</span>
+                <span className="text-white/50 font-medium">Thời gian thi</span>
+                <span className="text-white font-bold">{room.config.general.duration} phút</span>
               </div>
               <div className="flex justify-between text-xs">
-                <span className="text-white/50 font-medium">Tong cau hoi</span>
+                <span className="text-white/50 font-medium">Tổng câu hỏi</span>
                 <span className="text-white font-bold">
-                  {room.exam.parts.reduce((s, p) => s + p.questions.length, 0)} cau
+                  {room.exam.parts.reduce((s, p) => s + p.questions.length, 0)} câu
                 </span>
               </div>
               <div className="flex justify-between text-xs">
-                <span className="text-white/50 font-medium">Tong diem</span>
-                <span className="text-white font-bold">{room.exam.totalPoints} diem</span>
+                <span className="text-white/50 font-medium">Tổng điểm</span>
+                <span className="text-white font-bold">{room.exam.totalPoints} điểm</span>
               </div>
             </div>
 
@@ -183,28 +189,30 @@ export const ExamRoomCard: React.FC<ExamRoomCardProps> = ({ room, onClose, onOpe
               ) : (
                 <ExternalLink className="w-4 h-4" />
               )}
-              {copied === "link" ? "Da copy link!" : "COPY LINK HOC SINH"}
+              {copied === "link" ? "Đã sao chép liên kết" : "SAO CHÉP LINK HỌC SINH"}
             </button>
 
             {/* Dashboard button */}
             <button
               onClick={onOpenDashboard}
-              className="w-full flex items-center justify-center gap-2 py-2.5 rounded-xl bg-violet-500/20 hover:bg-violet-500/30 text-violet-300 text-xs font-bold border border-violet-500/30 transition-all active:scale-95"
+              className="flex w-full items-center justify-center gap-2 rounded-xl border border-sky-400/30 bg-sky-500/20 py-2.5 text-xs font-bold text-sky-200 transition-all hover:bg-sky-500/30 active:scale-95"
             >
               <BarChart3 className="w-4 h-4" />
-              XEM DASHBOARD LOP
+              XEM BẢNG ĐIỀU KHIỂN LỚP
             </button>
 
             {/* Close room button */}
             <button
-              onClick={handleClose}
+              onClick={() => void handleClose()}
+              disabled={isClosing}
               className="w-full flex items-center justify-center gap-2 py-2.5 rounded-xl bg-red-500/20 hover:bg-red-500/30 text-red-300 text-xs font-bold border border-red-500/20 transition-all active:scale-95"
             >
               <Trash2 className="w-4 h-4" />
-              DONG PHONG THI
+              {isClosing ? "ĐANG ĐÓNG…" : "ĐÓNG PHÒNG THI"}
             </button>
           </div>
         </div>
+        {roomError && <p role="alert" className="mx-5 mb-5 rounded-xl border border-red-400/30 bg-red-500/10 px-3 py-2 text-xs font-semibold text-red-200">{roomError}</p>}
       </div>
     </div>
   );

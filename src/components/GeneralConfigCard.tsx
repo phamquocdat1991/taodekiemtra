@@ -166,14 +166,14 @@ export const GeneralConfigCard: React.FC<GeneralConfigCardProps> = ({
   };
 
   return (
-    <div className="bg-white rounded-2xl shadow-[0_2px_8px_rgba(67,24,5,0.03)] border border-[#EFE7DF] border-l-4 border-l-[#F5730B] p-5 md:p-6 mb-5 transition-all">
+    <div className="bg-white rounded-2xl shadow-[0_2px_8px_rgba(7,26,51,0.03)] border border-[#e2e8f0] border-l-4 border-l-[#f2a900] p-5 md:p-6 mb-5 transition-all">
       {/* Title */}
-      <div className="flex items-center gap-2.5 pb-4 mb-4 border-b border-[#EFE7DF]">
-        <div className="w-8 h-8 rounded-xl bg-orange-100 text-[#F5730B] flex items-center justify-center font-bold text-sm shrink-0">
+      <div className="flex items-center gap-2.5 pb-4 mb-4 border-b border-[#e2e8f0]">
+        <div className="w-8 h-8 rounded-xl bg-orange-100 text-[#f2a900] flex items-center justify-center font-bold text-sm shrink-0">
           <Settings className="w-4 h-4" />
         </div>
         <div>
-          <h2 className="text-base md:text-lg font-black text-[#431805] tracking-tight">1. Thiết lập chung</h2>
+          <h2 className="text-base md:text-lg font-black text-[#071a33] tracking-tight">1. Thiết lập chung</h2>
           <p className="text-xs text-stone-500 font-medium">Thông tin đơn vị, khối lớp, môn học và mức độ đề</p>
         </div>
       </div>
@@ -182,41 +182,44 @@ export const GeneralConfigCard: React.FC<GeneralConfigCardProps> = ({
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3.5 mb-5">
         {/* Cơ quan chủ quản */}
         <div>
-          <label className="block text-xs font-bold text-stone-700 uppercase tracking-wider mb-1">
+          <label htmlFor="department" className="block text-xs font-bold text-stone-700 uppercase tracking-wider mb-1">
             CƠ QUAN CHỦ QUẢN
           </label>
           <input
+            id="department"
             type="text"
             value={general.department}
             onChange={(e) => onGeneralChange({ department: e.target.value })}
             placeholder="VD: SỞ GD&ĐT HÀ NỘI"
-            className="w-full px-3.5 py-2.5 rounded-xl border border-stone-200 focus:border-[#F5730B] focus:ring-2 focus:ring-orange-100 text-xs md:text-sm font-semibold text-[#431805] bg-[#FAF8F5]/60 focus:bg-white transition-all outline-none"
+            className="w-full px-3.5 py-2.5 rounded-xl border border-stone-200 focus:border-[#f2a900] focus:ring-2 focus:ring-orange-100 text-xs md:text-sm font-semibold text-[#071a33] bg-[#f8fafc]/60 focus:bg-white transition-all outline-none"
           />
         </div>
 
         {/* Tên trường */}
         <div>
-          <label className="block text-xs font-bold text-stone-700 uppercase tracking-wider mb-1">
+          <label htmlFor="school-name" className="block text-xs font-bold text-stone-700 uppercase tracking-wider mb-1">
             TÊN TRƯỜNG
           </label>
           <input
+            id="school-name"
             type="text"
             value={general.schoolName}
             onChange={(e) => onGeneralChange({ schoolName: e.target.value })}
             placeholder="VD: TRƯỜNG THPT CHU VĂN AN"
-            className="w-full px-3.5 py-2.5 rounded-xl border border-stone-200 focus:border-[#F5730B] focus:ring-2 focus:ring-orange-100 text-xs md:text-sm font-semibold text-[#431805] bg-[#FAF8F5]/60 focus:bg-white transition-all outline-none"
+            className="w-full px-3.5 py-2.5 rounded-xl border border-stone-200 focus:border-[#f2a900] focus:ring-2 focus:ring-orange-100 text-xs md:text-sm font-semibold text-[#071a33] bg-[#f8fafc]/60 focus:bg-white transition-all outline-none"
           />
         </div>
 
         {/* Đề kiểm tra */}
         <div>
-          <label className="block text-xs font-bold text-stone-700 uppercase tracking-wider mb-1">
+          <label htmlFor="exam-type" className="block text-xs font-bold text-stone-700 uppercase tracking-wider mb-1">
             ĐỀ KIỂM TRA
           </label>
           <select
+            id="exam-type"
             value={general.examType}
             onChange={(e) => onGeneralChange({ examType: e.target.value as ExamType })}
-            className="w-full px-3.5 py-2.5 rounded-xl border border-stone-200 focus:border-[#F5730B] focus:ring-2 focus:ring-orange-100 text-xs md:text-sm font-bold text-[#431805] bg-[#FAF8F5]/60 focus:bg-white transition-all outline-none cursor-pointer"
+            className="w-full px-3.5 py-2.5 rounded-xl border border-stone-200 focus:border-[#f2a900] focus:ring-2 focus:ring-orange-100 text-xs md:text-sm font-bold text-[#071a33] bg-[#f8fafc]/60 focus:bg-white transition-all outline-none cursor-pointer"
           >
             <option value="Kiểm tra thường xuyên">Kiểm tra thường xuyên (15-30p)</option>
             <option value="Giữa kì 1">Giữa kì 1</option>
@@ -229,13 +232,14 @@ export const GeneralConfigCard: React.FC<GeneralConfigCardProps> = ({
 
         {/* Cấp học */}
         <div>
-          <label className="block text-xs font-bold text-stone-700 uppercase tracking-wider mb-1">
+          <label htmlFor="education-level" className="block text-xs font-bold text-stone-700 uppercase tracking-wider mb-1">
             CẤP HỌC
           </label>
           <select
+            id="education-level"
             value={general.educationLevel}
             onChange={(e) => handleEducationLevelChange(e.target.value as EducationLevel)}
-            className="w-full px-3.5 py-2.5 rounded-xl border border-stone-200 focus:border-[#F5730B] focus:ring-2 focus:ring-orange-100 text-xs md:text-sm font-bold text-[#431805] bg-[#FAF8F5]/60 focus:bg-white transition-all outline-none cursor-pointer"
+            className="w-full px-3.5 py-2.5 rounded-xl border border-stone-200 focus:border-[#f2a900] focus:ring-2 focus:ring-orange-100 text-xs md:text-sm font-bold text-[#071a33] bg-[#f8fafc]/60 focus:bg-white transition-all outline-none cursor-pointer"
           >
             <option value="Tiểu học">Tiểu học (Lớp 1 - 5)</option>
             <option value="Cấp 2 (THCS)">Cấp 2 (THCS: Lớp 6 - 9)</option>
@@ -245,13 +249,14 @@ export const GeneralConfigCard: React.FC<GeneralConfigCardProps> = ({
 
         {/* Lớp */}
         <div>
-          <label className="block text-xs font-bold text-stone-700 uppercase tracking-wider mb-1">
+          <label htmlFor="grade" className="block text-xs font-bold text-stone-700 uppercase tracking-wider mb-1">
             LỚP
           </label>
           <select
+            id="grade"
             value={general.grade}
             onChange={(e) => onGeneralChange({ grade: e.target.value })}
-            className="w-full px-3.5 py-2.5 rounded-xl border border-stone-200 focus:border-[#F5730B] focus:ring-2 focus:ring-orange-100 text-xs md:text-sm font-bold text-[#431805] bg-[#FAF8F5]/60 focus:bg-white transition-all outline-none cursor-pointer"
+            className="w-full px-3.5 py-2.5 rounded-xl border border-stone-200 focus:border-[#f2a900] focus:ring-2 focus:ring-orange-100 text-xs md:text-sm font-bold text-[#071a33] bg-[#f8fafc]/60 focus:bg-white transition-all outline-none cursor-pointer"
           >
             {gradesByLevel[general.educationLevel].map((gr) => (
               <option key={gr} value={gr}>
@@ -263,16 +268,17 @@ export const GeneralConfigCard: React.FC<GeneralConfigCardProps> = ({
 
         {/* Môn học */}
         <div>
-          <label className="block text-xs font-bold text-stone-700 uppercase tracking-wider mb-1">
+          <label htmlFor="subject" className="block text-xs font-bold text-stone-700 uppercase tracking-wider mb-1">
             MÔN HỌC
           </label>
           <select
+            id="subject"
             value={general.subject}
             onChange={(e) => {
               onGeneralChange({ subject: e.target.value });
               onSubjectChange(e.target.value);
             }}
-            className="w-full px-3.5 py-2.5 rounded-xl border border-stone-200 focus:border-[#F5730B] focus:ring-2 focus:ring-orange-100 text-xs md:text-sm font-bold text-[#431805] bg-[#FAF8F5]/60 focus:bg-white transition-all outline-none cursor-pointer"
+            className="w-full px-3.5 py-2.5 rounded-xl border border-stone-200 focus:border-[#f2a900] focus:ring-2 focus:ring-orange-100 text-xs md:text-sm font-bold text-[#071a33] bg-[#f8fafc]/60 focus:bg-white transition-all outline-none cursor-pointer"
           >
             {subjectsByLevel[general.educationLevel].map((sub) => (
               <option key={sub} value={sub}>
@@ -284,13 +290,14 @@ export const GeneralConfigCard: React.FC<GeneralConfigCardProps> = ({
 
         {/* Bộ sách */}
         <div>
-          <label className="block text-xs font-bold text-stone-700 uppercase tracking-wider mb-1">
+          <label htmlFor="textbook" className="block text-xs font-bold text-stone-700 uppercase tracking-wider mb-1">
             BỘ SÁCH
           </label>
           <select
+            id="textbook"
             value={general.textbook}
             onChange={(e) => onGeneralChange({ textbook: e.target.value as Textbook })}
-            className="w-full px-3.5 py-2.5 rounded-xl border border-stone-200 focus:border-[#F5730B] focus:ring-2 focus:ring-orange-100 text-xs md:text-sm font-bold text-[#431805] bg-[#FAF8F5]/60 focus:bg-white transition-all outline-none cursor-pointer"
+            className="w-full px-3.5 py-2.5 rounded-xl border border-stone-200 focus:border-[#f2a900] focus:ring-2 focus:ring-orange-100 text-xs md:text-sm font-bold text-[#071a33] bg-[#f8fafc]/60 focus:bg-white transition-all outline-none cursor-pointer"
           >
             <option value="Kết nối tri thức với cuộc sống">Kết nối tri thức với cuộc sống</option>
             <option value="Cánh Diều">Cánh Diều</option>
@@ -302,18 +309,19 @@ export const GeneralConfigCard: React.FC<GeneralConfigCardProps> = ({
 
         {/* Thời gian */}
         <div>
-          <label className="block text-xs font-bold text-stone-700 uppercase tracking-wider mb-1">
+          <label htmlFor="duration" className="block text-xs font-bold text-stone-700 uppercase tracking-wider mb-1">
             THỜI GIAN (PHÚT)
           </label>
           <div className="relative">
             <input
+              id="duration"
               type="number"
               min={15}
               max={180}
               step={5}
               value={general.duration}
               onChange={(e) => onGeneralChange({ duration: Number(e.target.value) || 45 })}
-              className="w-full px-3.5 py-2.5 rounded-xl border border-stone-200 focus:border-[#F5730B] focus:ring-2 focus:ring-orange-100 text-xs md:text-sm font-semibold text-[#431805] bg-[#FAF8F5]/60 focus:bg-white transition-all outline-none pr-16"
+              className="w-full px-3.5 py-2.5 rounded-xl border border-stone-200 focus:border-[#f2a900] focus:ring-2 focus:ring-orange-100 text-xs md:text-sm font-semibold text-[#071a33] bg-[#f8fafc]/60 focus:bg-white transition-all outline-none pr-16"
             />
             <span className="absolute right-3.5 top-2.5 text-xs font-bold text-stone-400 pointer-events-none">
               PHÚT
@@ -323,13 +331,14 @@ export const GeneralConfigCard: React.FC<GeneralConfigCardProps> = ({
 
         {/* Mức độ đề */}
         <div>
-          <label className="block text-xs font-bold text-stone-700 uppercase tracking-wider mb-1">
+          <label htmlFor="difficulty" className="block text-xs font-bold text-stone-700 uppercase tracking-wider mb-1">
             MỨC ĐỘ ĐỀ
           </label>
           <select
+            id="difficulty"
             value={cognition.difficulty}
             onChange={(e) => onCognitionChange({ difficulty: e.target.value as ExamDifficulty })}
-            className="w-full px-3.5 py-2.5 rounded-xl border border-stone-200 focus:border-[#F5730B] focus:ring-2 focus:ring-orange-100 text-xs md:text-sm font-bold text-[#431805] bg-[#FAF8F5]/60 focus:bg-white transition-all outline-none cursor-pointer"
+            className="w-full px-3.5 py-2.5 rounded-xl border border-stone-200 focus:border-[#f2a900] focus:ring-2 focus:ring-orange-100 text-xs md:text-sm font-bold text-[#071a33] bg-[#f8fafc]/60 focus:bg-white transition-all outline-none cursor-pointer"
           >
             <option value="Dễ">Dễ (Học sinh đại trà)</option>
             <option value="Trung bình">Trung bình (Chuẩn kiến thức kĩ năng)</option>
@@ -342,8 +351,8 @@ export const GeneralConfigCard: React.FC<GeneralConfigCardProps> = ({
       {/* ── Preset Cards: Chọn cấp độ bẫy tư duy ── */}
       <div className="mb-5">
         <div className="flex items-center gap-2 mb-3">
-          <Zap className="w-4 h-4 text-[#8F310C]" />
-          <h3 className="text-xs font-extrabold text-[#8F310C] uppercase tracking-wider">
+          <Zap className="w-4 h-4 text-[#164e7a]" />
+          <h3 className="text-xs font-extrabold text-[#164e7a] uppercase tracking-wider">
             Chọn nhanh cấp độ đề (Tự động điền % nhận thức)
           </h3>
         </div>
@@ -417,11 +426,11 @@ export const GeneralConfigCard: React.FC<GeneralConfigCardProps> = ({
       </div>
 
       {/* Section III: Mức độ nhận thức */}
-      <div className="bg-[#FAF8F5] rounded-xl p-4 border border-[#EFE7DF]">
+      <div className="bg-[#f8fafc] rounded-xl p-4 border border-[#e2e8f0]">
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 mb-3">
           <div className="flex items-center gap-2">
-            <Sliders className="w-4 h-4 text-[#8F310C]" />
-            <h3 className="text-xs font-extrabold text-[#8F310C] uppercase tracking-wider">
+            <Sliders className="w-4 h-4 text-[#164e7a]" />
+            <h3 className="text-xs font-extrabold text-[#164e7a] uppercase tracking-wider">
               MỨC ĐỘ NHẬN THỨC (%) & MỨC ĐỘ ĐỀ
             </h3>
           </div>
@@ -450,6 +459,7 @@ export const GeneralConfigCard: React.FC<GeneralConfigCardProps> = ({
             </div>
             <div className="relative">
               <input
+                aria-label="Tỷ lệ nhận biết"
                 type="number"
                 min={0}
                 max={100}
@@ -469,6 +479,7 @@ export const GeneralConfigCard: React.FC<GeneralConfigCardProps> = ({
             </div>
             <div className="relative">
               <input
+                aria-label="Tỷ lệ thông hiểu"
                 type="number"
                 min={0}
                 max={100}
@@ -488,6 +499,7 @@ export const GeneralConfigCard: React.FC<GeneralConfigCardProps> = ({
             </div>
             <div className="relative">
               <input
+                aria-label="Tỷ lệ vận dụng"
                 type="number"
                 min={0}
                 max={100}
@@ -507,6 +519,7 @@ export const GeneralConfigCard: React.FC<GeneralConfigCardProps> = ({
             </div>
             <div className="relative">
               <input
+                aria-label="Tỷ lệ vận dụng cao"
                 type="number"
                 min={0}
                 max={100}

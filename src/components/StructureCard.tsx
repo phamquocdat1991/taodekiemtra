@@ -237,15 +237,15 @@ export const StructureCard: React.FC<StructureCardProps> = ({
   };
 
   return (
-    <div className="bg-white rounded-2xl shadow-[0_2px_8px_rgba(67,24,5,0.03)] border border-[#EFE7DF] border-l-4 border-l-[#F5730B] p-5 md:p-6 mb-5 transition-all">
+    <div className="bg-white rounded-2xl shadow-[0_2px_8px_rgba(7,26,51,0.03)] border border-[#e2e8f0] border-l-4 border-l-[#f2a900] p-5 md:p-6 mb-5 transition-all">
       {/* Title depending on subject */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-4 mb-4 border-b border-[#EFE7DF]">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-4 mb-4 border-b border-[#e2e8f0]">
         <div className="flex items-center gap-2.5">
-          <div className="w-8 h-8 rounded-xl bg-orange-100 text-[#F5730B] flex items-center justify-center font-bold text-sm shrink-0">
+          <div className="w-8 h-8 rounded-xl bg-orange-100 text-[#f2a900] flex items-center justify-center font-bold text-sm shrink-0">
             <ListFilter className="w-4 h-4" />
           </div>
           <div>
-            <h2 className="text-base md:text-lg font-black text-[#431805] tracking-tight">
+            <h2 className="text-base md:text-lg font-black text-[#071a33] tracking-tight">
               {isLanguage
                 ? "4. Cấu trúc câu hỏi & Điểm (Đặc thù môn Ngoại ngữ)"
                 : isLiterature
@@ -266,7 +266,7 @@ export const StructureCard: React.FC<StructureCardProps> = ({
           <button
             type="button"
             onClick={handleResetLang}
-            className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-bold bg-[#FAF8F5] text-[#8F310C] border border-[#EFE7DF] hover:bg-orange-50 hover:border-orange-200 transition-all self-start sm:self-center active:scale-95"
+            className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-bold bg-[#f8fafc] text-[#164e7a] border border-[#e2e8f0] hover:bg-orange-50 hover:border-orange-200 transition-all self-start sm:self-center active:scale-95"
           >
             <RotateCcw className="w-3.5 h-3.5" />
             <span>Reset cấu trúc chuẩn</span>
@@ -280,7 +280,7 @@ export const StructureCard: React.FC<StructureCardProps> = ({
           <div className="overflow-x-auto">
             <table className="w-full text-left text-xs md:text-sm">
               <thead>
-                <tr className="border-b border-[#EFE7DF] text-xs font-bold text-stone-600 uppercase tracking-wider">
+                <tr className="border-b border-[#e2e8f0] text-xs font-bold text-stone-600 uppercase tracking-wider">
                   <th className="pb-3 pl-2">Dạng câu hỏi</th>
                   <th className="pb-3 text-center">Số câu</th>
                   <th className="pb-3 text-center">Tỷ lệ (%)</th>
@@ -290,7 +290,7 @@ export const StructureCard: React.FC<StructureCardProps> = ({
               <tbody className="divide-y divide-stone-100">
                 {/* Trắc nghiệm nhiều lựa chọn */}
                 <tr className="hover:bg-stone-50/50">
-                  <td className="py-3 pl-2 font-bold text-[#431805]">
+                  <td className="py-3 pl-2 font-bold text-[#071a33]">
                     Trắc nghiệm (Nhiều lựa chọn A, B, C, D)
                   </td>
                   <td className="py-3 text-center w-28">
@@ -298,10 +298,11 @@ export const StructureCard: React.FC<StructureCardProps> = ({
                       type="number"
                       min={0}
                       value={std.multipleChoice.count}
+                      aria-label="Số câu trắc nghiệm nhiều lựa chọn"
                       onChange={(e) =>
                         handleStdRowChange("multipleChoice", "count", Number(e.target.value) || 0)
                       }
-                      className="w-20 px-2.5 py-1 text-center font-bold text-[#431805] rounded-lg border border-stone-200 focus:border-[#F5730B] outline-none"
+                      className="w-20 px-2.5 py-1 text-center font-bold text-[#071a33] rounded-lg border border-stone-200 focus:border-[#f2a900] outline-none"
                     />
                   </td>
                   <td className="py-3 text-center w-28">
@@ -311,16 +312,17 @@ export const StructureCard: React.FC<StructureCardProps> = ({
                         min={0}
                         max={100}
                         value={std.multipleChoice.percent}
+                        aria-label="Tỷ lệ trắc nghiệm nhiều lựa chọn"
                         onChange={(e) =>
                           handleStdRowChange("multipleChoice", "percent", Number(e.target.value) || 0)
                         }
-                        className="w-full px-2 py-1 pr-6 text-center font-bold text-[#431805] rounded-lg border border-stone-200 focus:border-[#F5730B] outline-none"
+                        className="w-full px-2 py-1 pr-6 text-center font-bold text-[#071a33] rounded-lg border border-stone-200 focus:border-[#f2a900] outline-none"
                       />
                       <span className="absolute right-2 top-1 text-xs text-stone-400 font-bold">%</span>
                     </div>
                   </td>
                   <td className="py-3 text-center w-28">
-                    <span className="font-extrabold text-[#8F310C]">
+                    <span className="font-extrabold text-[#164e7a]">
                       {std.multipleChoice.points}đ
                     </span>
                   </td>
@@ -328,7 +330,7 @@ export const StructureCard: React.FC<StructureCardProps> = ({
 
                 {/* Đúng / Sai */}
                 <tr className="hover:bg-stone-50/50">
-                  <td className="py-3 pl-2 font-bold text-[#431805]">
+                  <td className="py-3 pl-2 font-bold text-[#071a33]">
                     Trắc nghiệm Đúng / Sai (Mỗi câu 4 ý a, b, c, d)
                   </td>
                   <td className="py-3 text-center w-28">
@@ -336,10 +338,11 @@ export const StructureCard: React.FC<StructureCardProps> = ({
                       type="number"
                       min={0}
                       value={std.trueFalse.count}
+                      aria-label="Số câu đúng sai"
                       onChange={(e) =>
                         handleStdRowChange("trueFalse", "count", Number(e.target.value) || 0)
                       }
-                      className="w-20 px-2.5 py-1 text-center font-bold text-[#431805] rounded-lg border border-stone-200 focus:border-[#F5730B] outline-none"
+                      className="w-20 px-2.5 py-1 text-center font-bold text-[#071a33] rounded-lg border border-stone-200 focus:border-[#f2a900] outline-none"
                     />
                   </td>
                   <td className="py-3 text-center w-28">
@@ -349,16 +352,17 @@ export const StructureCard: React.FC<StructureCardProps> = ({
                         min={0}
                         max={100}
                         value={std.trueFalse.percent}
+                        aria-label="Tỷ lệ câu đúng sai"
                         onChange={(e) =>
                           handleStdRowChange("trueFalse", "percent", Number(e.target.value) || 0)
                         }
-                        className="w-full px-2 py-1 pr-6 text-center font-bold text-[#431805] rounded-lg border border-stone-200 focus:border-[#F5730B] outline-none"
+                        className="w-full px-2 py-1 pr-6 text-center font-bold text-[#071a33] rounded-lg border border-stone-200 focus:border-[#f2a900] outline-none"
                       />
                       <span className="absolute right-2 top-1 text-xs text-stone-400 font-bold">%</span>
                     </div>
                   </td>
                   <td className="py-3 text-center w-28">
-                    <span className="font-extrabold text-[#8F310C]">
+                    <span className="font-extrabold text-[#164e7a]">
                       {std.trueFalse.points}đ
                     </span>
                   </td>
@@ -366,7 +370,7 @@ export const StructureCard: React.FC<StructureCardProps> = ({
 
                 {/* Trả lời ngắn */}
                 <tr className="hover:bg-stone-50/50">
-                  <td className="py-3 pl-2 font-bold text-[#431805]">
+                  <td className="py-3 pl-2 font-bold text-[#071a33]">
                     Trả lời ngắn (Điền đáp số / kết quả)
                   </td>
                   <td className="py-3 text-center w-28">
@@ -374,10 +378,11 @@ export const StructureCard: React.FC<StructureCardProps> = ({
                       type="number"
                       min={0}
                       value={std.shortAnswer.count}
+                      aria-label="Số câu trả lời ngắn"
                       onChange={(e) =>
                         handleStdRowChange("shortAnswer", "count", Number(e.target.value) || 0)
                       }
-                      className="w-20 px-2.5 py-1 text-center font-bold text-[#431805] rounded-lg border border-stone-200 focus:border-[#F5730B] outline-none"
+                      className="w-20 px-2.5 py-1 text-center font-bold text-[#071a33] rounded-lg border border-stone-200 focus:border-[#f2a900] outline-none"
                     />
                   </td>
                   <td className="py-3 text-center w-28">
@@ -387,16 +392,17 @@ export const StructureCard: React.FC<StructureCardProps> = ({
                         min={0}
                         max={100}
                         value={std.shortAnswer.percent}
+                        aria-label="Tỷ lệ câu trả lời ngắn"
                         onChange={(e) =>
                           handleStdRowChange("shortAnswer", "percent", Number(e.target.value) || 0)
                         }
-                        className="w-full px-2 py-1 pr-6 text-center font-bold text-[#431805] rounded-lg border border-stone-200 focus:border-[#F5730B] outline-none"
+                        className="w-full px-2 py-1 pr-6 text-center font-bold text-[#071a33] rounded-lg border border-stone-200 focus:border-[#f2a900] outline-none"
                       />
                       <span className="absolute right-2 top-1 text-xs text-stone-400 font-bold">%</span>
                     </div>
                   </td>
                   <td className="py-3 text-center w-28">
-                    <span className="font-extrabold text-[#8F310C]">
+                    <span className="font-extrabold text-[#164e7a]">
                       {std.shortAnswer.points}đ
                     </span>
                   </td>
@@ -404,7 +410,7 @@ export const StructureCard: React.FC<StructureCardProps> = ({
 
                 {/* Tự luận */}
                 <tr className="hover:bg-stone-50/50">
-                  <td className="py-3 pl-2 font-bold text-[#431805]">
+                  <td className="py-3 pl-2 font-bold text-[#071a33]">
                     Tự luận (Trình bày chi tiết / Bài toán lớn)
                   </td>
                   <td className="py-3 text-center w-28">
@@ -412,10 +418,11 @@ export const StructureCard: React.FC<StructureCardProps> = ({
                       type="number"
                       min={0}
                       value={std.essay.count}
+                      aria-label="Số câu tự luận"
                       onChange={(e) =>
                         handleStdRowChange("essay", "count", Number(e.target.value) || 0)
                       }
-                      className="w-20 px-2.5 py-1 text-center font-bold text-[#431805] rounded-lg border border-stone-200 focus:border-[#F5730B] outline-none"
+                      className="w-20 px-2.5 py-1 text-center font-bold text-[#071a33] rounded-lg border border-stone-200 focus:border-[#f2a900] outline-none"
                     />
                   </td>
                   <td className="py-3 text-center w-28">
@@ -425,16 +432,17 @@ export const StructureCard: React.FC<StructureCardProps> = ({
                         min={0}
                         max={100}
                         value={std.essay.percent}
+                        aria-label="Tỷ lệ câu tự luận"
                         onChange={(e) =>
                           handleStdRowChange("essay", "percent", Number(e.target.value) || 0)
                         }
-                        className="w-full px-2 py-1 pr-6 text-center font-bold text-[#431805] rounded-lg border border-stone-200 focus:border-[#F5730B] outline-none"
+                        className="w-full px-2 py-1 pr-6 text-center font-bold text-[#071a33] rounded-lg border border-stone-200 focus:border-[#f2a900] outline-none"
                       />
                       <span className="absolute right-2 top-1 text-xs text-stone-400 font-bold">%</span>
                     </div>
                   </td>
                   <td className="py-3 text-center w-28">
-                    <span className="font-extrabold text-[#8F310C]">{std.essay.points}đ</span>
+                    <span className="font-extrabold text-[#164e7a]">{std.essay.points}đ</span>
                   </td>
                 </tr>
               </tbody>
@@ -454,7 +462,7 @@ export const StructureCard: React.FC<StructureCardProps> = ({
       {/* CASE B: NGOẠI NGỮ / TIẾNG ANH (4 PHẦN CHUẨN) */}
       {isLanguage && (
         <div>
-          <div className="mb-3 px-3 py-2 bg-amber-50 rounded-xl border border-amber-200 text-xs font-bold text-[#8F310C] flex items-center justify-between">
+          <div className="mb-3 px-3 py-2 bg-amber-50 rounded-xl border border-amber-200 text-xs font-bold text-[#164e7a] flex items-center justify-between">
             <span>CẤU TRÚC 4 PHẦN KIỂM TRA NGOẠI NGỮ</span>
             <span className="text-[11px] font-medium text-amber-700">Định dạng khảo thí quốc gia</span>
           </div>
@@ -462,7 +470,7 @@ export const StructureCard: React.FC<StructureCardProps> = ({
           <div className="overflow-x-auto">
             <table className="w-full text-left text-xs md:text-sm">
               <thead>
-                <tr className="border-b border-[#EFE7DF] text-xs font-bold text-stone-600 uppercase tracking-wider">
+                <tr className="border-b border-[#e2e8f0] text-xs font-bold text-stone-600 uppercase tracking-wider">
                   <th className="pb-3 pl-2">Phần kiểm tra</th>
                   <th className="pb-3 text-center">Số câu</th>
                   <th className="pb-3 text-center">Tỷ lệ (%)</th>
@@ -472,7 +480,7 @@ export const StructureCard: React.FC<StructureCardProps> = ({
               <tbody className="divide-y divide-stone-100">
                 {/* Listening */}
                 <tr className="hover:bg-stone-50/50">
-                  <td className="py-3 pl-2 font-bold text-[#431805]">
+                  <td className="py-3 pl-2 font-bold text-[#071a33]">
                     Phần I: Nghe (Listening)
                   </td>
                   <td className="py-3 text-center w-28">
@@ -480,10 +488,11 @@ export const StructureCard: React.FC<StructureCardProps> = ({
                       type="number"
                       min={0}
                       value={lang.listening.count}
+                      aria-label="Số câu nghe"
                       onChange={(e) =>
                         handleLangRowChange("listening", "count", Number(e.target.value) || 0)
                       }
-                      className="w-20 px-2.5 py-1 text-center font-bold text-[#431805] rounded-lg border border-stone-200 focus:border-[#F5730B] outline-none"
+                      className="w-20 px-2.5 py-1 text-center font-bold text-[#071a33] rounded-lg border border-stone-200 focus:border-[#f2a900] outline-none"
                     />
                   </td>
                   <td className="py-3 text-center w-28">
@@ -493,22 +502,23 @@ export const StructureCard: React.FC<StructureCardProps> = ({
                         min={0}
                         max={100}
                         value={lang.listening.percent}
+                        aria-label="Tỷ lệ phần nghe"
                         onChange={(e) =>
                           handleLangRowChange("listening", "percent", Number(e.target.value) || 0)
                         }
-                        className="w-full px-2 py-1 pr-6 text-center font-bold text-[#431805] rounded-lg border border-stone-200 focus:border-[#F5730B] outline-none"
+                        className="w-full px-2 py-1 pr-6 text-center font-bold text-[#071a33] rounded-lg border border-stone-200 focus:border-[#f2a900] outline-none"
                       />
                       <span className="absolute right-2 top-1 text-xs text-stone-400 font-bold">%</span>
                     </div>
                   </td>
                   <td className="py-3 text-center w-28">
-                    <span className="font-extrabold text-[#8F310C]">{lang.listening.points}đ</span>
+                    <span className="font-extrabold text-[#164e7a]">{lang.listening.points}đ</span>
                   </td>
                 </tr>
 
                 {/* Language Focus */}
                 <tr className="hover:bg-stone-50/50">
-                  <td className="py-3 pl-2 font-bold text-[#431805]">
+                  <td className="py-3 pl-2 font-bold text-[#071a33]">
                     Phần II: Ngôn ngữ (Language Focus)
                   </td>
                   <td className="py-3 text-center w-28">
@@ -516,10 +526,11 @@ export const StructureCard: React.FC<StructureCardProps> = ({
                       type="number"
                       min={0}
                       value={lang.languageFocus.count}
+                      aria-label="Số câu kiến thức ngôn ngữ"
                       onChange={(e) =>
                         handleLangRowChange("languageFocus", "count", Number(e.target.value) || 0)
                       }
-                      className="w-20 px-2.5 py-1 text-center font-bold text-[#431805] rounded-lg border border-stone-200 focus:border-[#F5730B] outline-none"
+                      className="w-20 px-2.5 py-1 text-center font-bold text-[#071a33] rounded-lg border border-stone-200 focus:border-[#f2a900] outline-none"
                     />
                   </td>
                   <td className="py-3 text-center w-28">
@@ -529,22 +540,23 @@ export const StructureCard: React.FC<StructureCardProps> = ({
                         min={0}
                         max={100}
                         value={lang.languageFocus.percent}
+                        aria-label="Tỷ lệ kiến thức ngôn ngữ"
                         onChange={(e) =>
                           handleLangRowChange("languageFocus", "percent", Number(e.target.value) || 0)
                         }
-                        className="w-full px-2 py-1 pr-6 text-center font-bold text-[#431805] rounded-lg border border-stone-200 focus:border-[#F5730B] outline-none"
+                        className="w-full px-2 py-1 pr-6 text-center font-bold text-[#071a33] rounded-lg border border-stone-200 focus:border-[#f2a900] outline-none"
                       />
                       <span className="absolute right-2 top-1 text-xs text-stone-400 font-bold">%</span>
                     </div>
                   </td>
                   <td className="py-3 text-center w-28">
-                    <span className="font-extrabold text-[#8F310C]">{lang.languageFocus.points}đ</span>
+                    <span className="font-extrabold text-[#164e7a]">{lang.languageFocus.points}đ</span>
                   </td>
                 </tr>
 
                 {/* Reading */}
                 <tr className="hover:bg-stone-50/50">
-                  <td className="py-3 pl-2 font-bold text-[#431805]">
+                  <td className="py-3 pl-2 font-bold text-[#071a33]">
                     Phần III: Đọc (Reading)
                   </td>
                   <td className="py-3 text-center w-28">
@@ -552,10 +564,11 @@ export const StructureCard: React.FC<StructureCardProps> = ({
                       type="number"
                       min={0}
                       value={lang.reading.count}
+                      aria-label="Số câu đọc hiểu"
                       onChange={(e) =>
                         handleLangRowChange("reading", "count", Number(e.target.value) || 0)
                       }
-                      className="w-20 px-2.5 py-1 text-center font-bold text-[#431805] rounded-lg border border-stone-200 focus:border-[#F5730B] outline-none"
+                      className="w-20 px-2.5 py-1 text-center font-bold text-[#071a33] rounded-lg border border-stone-200 focus:border-[#f2a900] outline-none"
                     />
                   </td>
                   <td className="py-3 text-center w-28">
@@ -565,22 +578,23 @@ export const StructureCard: React.FC<StructureCardProps> = ({
                         min={0}
                         max={100}
                         value={lang.reading.percent}
+                        aria-label="Tỷ lệ đọc hiểu"
                         onChange={(e) =>
                           handleLangRowChange("reading", "percent", Number(e.target.value) || 0)
                         }
-                        className="w-full px-2 py-1 pr-6 text-center font-bold text-[#431805] rounded-lg border border-stone-200 focus:border-[#F5730B] outline-none"
+                        className="w-full px-2 py-1 pr-6 text-center font-bold text-[#071a33] rounded-lg border border-stone-200 focus:border-[#f2a900] outline-none"
                       />
                       <span className="absolute right-2 top-1 text-xs text-stone-400 font-bold">%</span>
                     </div>
                   </td>
                   <td className="py-3 text-center w-28">
-                    <span className="font-extrabold text-[#8F310C]">{lang.reading.points}đ</span>
+                    <span className="font-extrabold text-[#164e7a]">{lang.reading.points}đ</span>
                   </td>
                 </tr>
 
                 {/* Writing */}
                 <tr className="hover:bg-stone-50/50">
-                  <td className="py-3 pl-2 font-bold text-[#431805]">
+                  <td className="py-3 pl-2 font-bold text-[#071a33]">
                     Phần IV: Viết (Writing)
                   </td>
                   <td className="py-3 text-center w-28">
@@ -588,10 +602,11 @@ export const StructureCard: React.FC<StructureCardProps> = ({
                       type="number"
                       min={0}
                       value={lang.writing.count}
+                      aria-label="Số câu viết"
                       onChange={(e) =>
                         handleLangRowChange("writing", "count", Number(e.target.value) || 0)
                       }
-                      className="w-20 px-2.5 py-1 text-center font-bold text-[#431805] rounded-lg border border-stone-200 focus:border-[#F5730B] outline-none"
+                      className="w-20 px-2.5 py-1 text-center font-bold text-[#071a33] rounded-lg border border-stone-200 focus:border-[#f2a900] outline-none"
                     />
                   </td>
                   <td className="py-3 text-center w-28">
@@ -601,16 +616,17 @@ export const StructureCard: React.FC<StructureCardProps> = ({
                         min={0}
                         max={100}
                         value={lang.writing.percent}
+                        aria-label="Tỷ lệ phần viết"
                         onChange={(e) =>
                           handleLangRowChange("writing", "percent", Number(e.target.value) || 0)
                         }
-                        className="w-full px-2 py-1 pr-6 text-center font-bold text-[#431805] rounded-lg border border-stone-200 focus:border-[#F5730B] outline-none"
+                        className="w-full px-2 py-1 pr-6 text-center font-bold text-[#071a33] rounded-lg border border-stone-200 focus:border-[#f2a900] outline-none"
                       />
                       <span className="absolute right-2 top-1 text-xs text-stone-400 font-bold">%</span>
                     </div>
                   </td>
                   <td className="py-3 text-center w-28">
-                    <span className="font-extrabold text-[#8F310C]">{lang.writing.points}đ</span>
+                    <span className="font-extrabold text-[#164e7a]">{lang.writing.points}đ</span>
                   </td>
                 </tr>
               </tbody>
@@ -637,7 +653,7 @@ export const StructureCard: React.FC<StructureCardProps> = ({
               onClick={() => setLiteraturePreset("6/4")}
               className={`px-3.5 py-1.5 rounded-xl text-xs font-bold transition-all active:scale-95 ${
                 lit.preset === "6/4"
-                  ? "bg-[#F5730B] text-white shadow-xs"
+                  ? "bg-[#f2a900] text-white shadow-xs"
                   : "bg-stone-100 text-stone-700 hover:bg-stone-200"
               }`}
             >
@@ -648,7 +664,7 @@ export const StructureCard: React.FC<StructureCardProps> = ({
               onClick={() => setLiteraturePreset("5/5")}
               className={`px-3.5 py-1.5 rounded-xl text-xs font-bold transition-all active:scale-95 ${
                 lit.preset === "5/5"
-                  ? "bg-[#F5730B] text-white shadow-xs"
+                  ? "bg-[#f2a900] text-white shadow-xs"
                   : "bg-stone-100 text-stone-700 hover:bg-stone-200"
               }`}
             >
@@ -659,8 +675,8 @@ export const StructureCard: React.FC<StructureCardProps> = ({
           <div className="grid grid-cols-1 md:grid-cols-2 gap-3.5">
             <div className="p-4 rounded-xl bg-orange-50/40 border border-orange-200/80">
               <div className="flex justify-between items-center mb-2">
-                <h4 className="font-bold text-[#431805] text-xs md:text-sm">Phần I: Đọc hiểu</h4>
-                <span className="px-2 py-0.5 rounded-lg text-xs font-bold bg-[#F5730B] text-white">
+                <h4 className="font-bold text-[#071a33] text-xs md:text-sm">Phần I: Đọc hiểu</h4>
+                <span className="px-2 py-0.5 rounded-lg text-xs font-bold bg-[#f2a900] text-white">
                   {lit.readingComprehension.points} điểm ({lit.readingComprehension.percent}%)
                 </span>
               </div>
@@ -671,8 +687,8 @@ export const StructureCard: React.FC<StructureCardProps> = ({
 
             <div className="p-4 rounded-xl bg-orange-50/40 border border-orange-200/80">
               <div className="flex justify-between items-center mb-2">
-                <h4 className="font-bold text-[#431805] text-xs md:text-sm">Phần II: Viết / Làm văn</h4>
-                <span className="px-2 py-0.5 rounded-lg text-xs font-bold bg-[#8F310C] text-white">
+                <h4 className="font-bold text-[#071a33] text-xs md:text-sm">Phần II: Viết / Làm văn</h4>
+                <span className="px-2 py-0.5 rounded-lg text-xs font-bold bg-[#164e7a] text-white">
                   {lit.writingComposition.points} điểm ({lit.writingComposition.percent}%)
                 </span>
               </div>
@@ -682,7 +698,7 @@ export const StructureCard: React.FC<StructureCardProps> = ({
             </div>
           </div>
 
-          <div className="mt-4 pt-3 border-t border-[#EFE7DF] flex items-center justify-between">
+          <div className="mt-4 pt-3 border-t border-[#e2e8f0] flex items-center justify-between">
             <span className="text-xs font-bold text-stone-500">
               Tổng điểm kiểm tra Ngữ văn:
             </span>

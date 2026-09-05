@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useRef } from "react";
+import { BookOpenText, Check, ListChecks, Settings2 } from "lucide-react";
 import {
   FullExamState,
   MatrixData,
@@ -17,16 +18,6 @@ import {
   generateDetailGuideAI,
   getCustomApiKey,
 } from "./services/geminiService";
-import {
-  generateMatrixDocxBlob,
-  generateSpecDocxBlob,
-  generateExamDocxBlob,
-  generateAnswersDocxBlob,
-  generateDetailGuideDocxBlob,
-  downloadBlob,
-  exportAllFilesZip,
-} from "./services/wordExportService";
-
 // UI Components
 import { Header } from "./components/Header";
 import { GeneralConfigCard } from "./components/GeneralConfigCard";
@@ -41,6 +32,7 @@ import { ExamStepView } from "./components/ExamStepView";
 import { AnswerStepView } from "./components/AnswerStepView";
 import { DetailStepView } from "./components/DetailStepView";
 import { SummaryStepView } from "./components/SummaryStepView";
+import { ConfigurationSummary } from "./components/ConfigurationSummary";
 
 // Phase 2: Online Exam Room
 import { ExamRoomCard } from "./components/ExamRoomCard";
@@ -49,6 +41,11 @@ import { OnlineExamRoom } from "./components/OnlineExamRoom";
 import { ClassroomDashboard } from "./components/ClassroomDashboard";
 import { createRoom, getRoom } from "./services/roomService";
 import { OnlineRoom } from "./types";
+import { validateExamConfig } from "./lib/examValidation";
+import { applySubjectPreset } from "./lib/subjectPresets";
+import { useAuth } from "./contexts/AuthContext";
+import { AuthScreen } from "./components/AuthScreen";
+import { ResetPasswordScreen } from "./components/ResetPasswordScreen";
 
 // Modals
 import { ApiKeyModal } from "./components/ApiKeyModal";
@@ -57,6 +54,7 @@ import { ConfigPresetsModal } from "./components/ConfigPresetsModal";
 import { EditModal } from "./components/EditModal";
 
 export function App() {
+  const { user, loading: authLoading, isRecovery, signOut } = useAuth();
   // Main State
   const [viewMode, setViewMode] = useState<"config" | "workflow" | "student" | "exam">("config");
   const [config, setConfig] = useState<FullExamState>(defaultPresets[0].state);
@@ -83,6 +81,7 @@ export function App() {
   const [completedSteps, setCompletedSteps] = useState<number[]>([]);
   const [isGenerating, setIsGenerating] = useState(false);
   const [hasCopied, setHasCopied] = useState(false);
+  const [generationError, setGenerationError] = useState<string | null>(null);
 
   // Auto-Mode State
   const [autoMode, setAutoMode] = useState(false);
@@ -106,38 +105,35 @@ export function App() {
   }, []);
 
   // Validation
-  const totalCognition =
-    Number(config.cognition.nb || 0) +
-    Number(config.cognition.th || 0) +
-    Number(config.cognition.vd || 0) +
-    Number(config.cognition.vdc || 0);
+  const configValidation = validateExamConfig(config);
+  const isConfigValid = configValidation.isValid;
 
-  const isConfigValid = totalCognition === 100;
+  if (authLoading && viewMode !== "student" && viewMode !== "exam") {
+    return (
+      <div className="grid min-h-screen place-items-center bg-[#071a33] text-white" role="status">
+        <div className="text-center">
+          <div className="mx-auto mb-4 h-10 w-10 animate-spin rounded-full border-4 border-white/20 border-t-amber-400" />
+          <p className="text-sm font-bold">Đang khôi phục phiên đăng nhập…</p>
+        </div>
+      </div>
+    );
+  }
+
+  if (isRecovery) return <ResetPasswordScreen />;
+
+  if (!user && (viewMode === "config" || viewMode === "workflow")) {
+    return <AuthScreen onStudentPortal={() => setViewMode("student")} />;
+  }
 
   // Handle subject change & auto presets
   const handleSubjectChange = (newSubject: string) => {
-    const matchedPreset = defaultPresets.find(
-      (p) =>
-        p.state.general.subject.toLowerCase() === newSubject.toLowerCase() ||
-        (newSubject.toLowerCase().includes("tiếng anh") && p.id === "preset-english-10") ||
-        (newSubject.toLowerCase().includes("văn") && p.id === "preset-lit-10")
-    );
-
-    if (matchedPreset) {
-      setConfig((prev) => ({
-        ...prev,
-        structure: matchedPreset.state.structure,
-        knowledge: {
-          ...prev.knowledge,
-          content: matchedPreset.state.knowledge.content,
-        },
-      }));
-    }
+    setConfig((previous) => applySubjectPreset(previous, newSubject, defaultPresets));
   };
 
   // Typed Step Generators
   const generateStep1 = async (cfg = config): Promise<MatrixData | null> => {
     setIsGenerating(true);
+    setGenerationError(null);
     try {
       const m = await generateMatrixAI(cfg);
       setMatrix(m);
@@ -145,6 +141,7 @@ export function App() {
       return m;
     } catch (err) {
       console.error("Error generating step 1:", err);
+      setGenerationError(err instanceof Error ? err.message : "Không thể tạo ma trận.");
       return null;
     } finally {
       setIsGenerating(false);
@@ -154,6 +151,7 @@ export function App() {
   const generateStep2 = async (cfg = config, m = matrix): Promise<SpecificationData | null> => {
     if (!m) return null;
     setIsGenerating(true);
+    setGenerationError(null);
     try {
       const s = await generateSpecificationAI(cfg, m);
       setSpec(s);
@@ -161,6 +159,7 @@ export function App() {
       return s;
     } catch (err) {
       console.error("Error generating step 2:", err);
+      setGenerationError(err instanceof Error ? err.message : "Không thể tạo bản đặc tả.");
       return null;
     } finally {
       setIsGenerating(false);
@@ -174,6 +173,7 @@ export function App() {
   ): Promise<ExamData | null> => {
     if (!m || !s) return null;
     setIsGenerating(true);
+    setGenerationError(null);
     try {
       const e = await generateExamAI(cfg, m, s);
       setExam(e);
@@ -181,6 +181,7 @@ export function App() {
       return e;
     } catch (err) {
       console.error("Error generating step 3:", err);
+      setGenerationError(err instanceof Error ? err.message : "Không thể tạo đề thi.");
       return null;
     } finally {
       setIsGenerating(false);
@@ -190,6 +191,7 @@ export function App() {
   const generateStep4 = async (cfg = config, e = exam): Promise<AnswerData | null> => {
     if (!e) return null;
     setIsGenerating(true);
+    setGenerationError(null);
     try {
       const a = await generateAnswersAI(cfg, e);
       setAnswers(a);
@@ -197,6 +199,7 @@ export function App() {
       return a;
     } catch (err) {
       console.error("Error generating step 4:", err);
+      setGenerationError(err instanceof Error ? err.message : "Không thể tạo đáp án.");
       return null;
     } finally {
       setIsGenerating(false);
@@ -210,6 +213,7 @@ export function App() {
   ): Promise<DetailGuideData | null> => {
     if (!e || !a) return null;
     setIsGenerating(true);
+    setGenerationError(null);
     try {
       const d = await generateDetailGuideAI(cfg, e, a);
       setDetail(d);
@@ -217,6 +221,7 @@ export function App() {
       return d;
     } catch (err) {
       console.error("Error generating step 5:", err);
+      setGenerationError(err instanceof Error ? err.message : "Không thể tạo hướng dẫn chi tiết.");
       return null;
     } finally {
       setIsGenerating(false);
@@ -226,11 +231,15 @@ export function App() {
   // Phase 2 & 3: Create Online Room Handler
   const handleCreateRoom = async () => {
     if (!exam || !answers) return;
-    const pin = await createRoom(config, exam, answers);
-    const room = await getRoom(pin);
-    if (room) {
+    setGenerationError(null);
+    try {
+      const pin = await createRoom(config, exam, answers, detail);
+      const room = await getRoom(pin);
+      if (!room) throw new Error("Phòng đã tạo nhưng chưa thể tải lại dữ liệu.");
       setActiveRoom(room);
       setIsRoomModalOpen(true);
+    } catch (cause) {
+      setGenerationError(cause instanceof Error ? cause.message : "Không thể tạo phòng thi.");
     }
   };
 
@@ -431,6 +440,15 @@ export function App() {
 
   // Export Word Individual
   const handleExportSingleDocx = async (step: WorkflowStep) => {
+    const {
+      downloadBlob,
+      exportAllFilesZip,
+      generateAnswersDocxBlob,
+      generateDetailGuideDocxBlob,
+      generateExamDocxBlob,
+      generateMatrixDocxBlob,
+      generateSpecDocxBlob,
+    } = await import("./services/wordExportService");
     const baseName = `De_Kiem_Tra_${config.general.subject}_${config.general.grade.replace(/\s+/g, "_")}`;
 
     if (step === 1 && matrix) {
@@ -454,22 +472,19 @@ export function App() {
   };
 
   const handleExportAllZip = async () => {
+    const { exportAllFilesZip } = await import("./services/wordExportService");
     await exportAllFilesZip(config, matrix, spec, exam, answers, detail);
   };
 
-  // Reset Session
-  const handleResetSession = () => {
-    if (window.confirm("Thầy/Cô có chắc chắn muốn làm mới toàn bộ cấu hình và dữ liệu đã tạo?")) {
-      setConfig(defaultPresets[0].state);
-      setMatrix(null);
-      setSpec(null);
-      setExam(null);
-      setAnswers(null);
-      setDetail(null);
-      setCompletedSteps([]);
-      setCurrentStep(1);
-      setViewMode("config");
+  const handleSignOut = async () => {
+    try {
+      await signOut();
+      setIsRoomModalOpen(false);
+      setIsDashboardOpen(false);
+      setActiveRoom(null);
       handleCancelAuto();
+    } catch (error) {
+      window.alert(error instanceof Error ? error.message : "Không thể đăng xuất.");
     }
   };
 
@@ -492,7 +507,7 @@ export function App() {
   };
 
   return (
-    <div className="min-h-screen bg-[#FAF8F5]/80 text-stone-800 font-sans antialiased pb-28">
+    <div className="min-h-screen bg-[#f3f6fa] pb-28 font-sans text-slate-800 antialiased">
 
       {/* Phase 2: Student Portal View */}
       {viewMode === "student" && (
@@ -514,56 +529,55 @@ export function App() {
 
       {/* Main Teacher App */}
       {(viewMode === "config" || viewMode === "workflow") && (
-        <div className="max-w-[1020px] mx-auto pt-4 md:pt-6 px-3 sm:px-4">
+        <div className="mx-auto max-w-[1440px] px-3 pt-4 sm:px-4 md:pt-6 lg:px-6">
         <Header
           onOpenApiKeyModal={() => setIsApiKeyModalOpen(true)}
           onOpenGuideModal={() => setIsGuideModalOpen(true)}
-          onResetSession={handleResetSession}
+          onSignOut={handleSignOut}
           hasCustomKey={hasCustomKey}
           onGoToStudentPortal={handleGoToStudentPortal}
+          teacherEmail={user?.email ?? ""}
         />
 
         {/* 1. CONFIGURATION VIEW */}
         {viewMode === "config" && (
           <div className="animate-in fade-in duration-300">
-            <GeneralConfigCard
-              general={config.general}
-              cognition={config.cognition}
-              onGeneralChange={(updated) =>
-                setConfig((prev) => ({
-                  ...prev,
-                  general: { ...prev.general, ...updated },
-                }))
-              }
-              onCognitionChange={(updated) =>
-                setConfig((prev) => ({
-                  ...prev,
-                  cognition: { ...prev.cognition, ...updated },
-                }))
-              }
-              onSubjectChange={handleSubjectChange}
-            />
+            <div className="grid items-start gap-5 xl:grid-cols-[190px_minmax(0,1fr)_260px]">
+              <aside className="hidden rounded-2xl border border-slate-200 bg-white p-3 shadow-[0_12px_30px_rgba(7,26,51,0.05)] xl:sticky xl:top-4 xl:block" aria-label="Các bước cấu hình">
+                <p className="px-3 pb-3 pt-2 text-[10px] font-black uppercase tracking-[0.2em] text-slate-400">Thiết lập đề</p>
+                {[
+                  { id: "general-config", icon: Settings2, title: "Thông tin chung", hint: "Môn, lớp, độ khó" },
+                  { id: "knowledge-config", icon: BookOpenText, title: "Nội dung", hint: "Kiến thức, tài liệu" },
+                  { id: "structure-config", icon: ListChecks, title: "Cấu trúc", hint: "Số câu, điểm số" },
+                ].map(({ id, icon: Icon, title, hint }, index) => (
+                  <button key={id} type="button" onClick={() => document.getElementById(id)?.scrollIntoView({ behavior: "smooth", block: "start" })} className="group mb-1 flex w-full items-start gap-2.5 rounded-xl px-3 py-3 text-left transition hover:bg-amber-50">
+                    <span className="grid h-7 w-7 shrink-0 place-items-center rounded-lg bg-[#071a33] text-amber-300"><Icon className="h-3.5 w-3.5" /></span>
+                    <span><span className="block text-xs font-black text-[#071a33]">{index + 1}. {title}</span><span className="mt-0.5 block text-[10px] leading-4 text-slate-400">{hint}</span></span>
+                  </button>
+                ))}
+                <div className={`mt-3 flex items-center gap-2 rounded-xl px-3 py-2.5 text-[11px] font-bold ${isConfigValid ? "bg-emerald-50 text-emerald-700" : "bg-slate-50 text-slate-500"}`}><Check className="h-3.5 w-3.5" />{isConfigValid ? "Cấu hình hợp lệ" : "Đang hoàn thiện"}</div>
+              </aside>
 
-            <KnowledgeCard
-              knowledge={config.knowledge}
-              onChange={(updated) =>
-                setConfig((prev) => ({
-                  ...prev,
-                  knowledge: { ...prev.knowledge, ...updated },
-                }))
-              }
-            />
+              <main className="min-w-0">
+                <section id="general-config" className="scroll-mt-4">
+                  <GeneralConfigCard
+                    general={config.general}
+                    cognition={config.cognition}
+                    onGeneralChange={(updated) => setConfig((prev) => ({ ...prev, general: { ...prev.general, ...updated } }))}
+                    onCognitionChange={(updated) => setConfig((prev) => ({ ...prev, cognition: { ...prev.cognition, ...updated } }))}
+                    onSubjectChange={handleSubjectChange}
+                  />
+                </section>
+                <section id="knowledge-config" className="scroll-mt-4">
+                  <KnowledgeCard knowledge={config.knowledge} onChange={(updated) => setConfig((prev) => ({ ...prev, knowledge: { ...prev.knowledge, ...updated } }))} />
+                </section>
+                <section id="structure-config" className="scroll-mt-4">
+                  <StructureCard subject={config.general.subject} structure={config.structure} onChange={(updated) => setConfig((prev) => ({ ...prev, structure: { ...prev.structure, ...updated } }))} />
+                </section>
+              </main>
 
-            <StructureCard
-              subject={config.general.subject}
-              structure={config.structure}
-              onChange={(updated) =>
-                setConfig((prev) => ({
-                  ...prev,
-                  structure: { ...prev.structure, ...updated },
-                }))
-              }
-            />
+              <ConfigurationSummary config={config} validation={configValidation} />
+            </div>
 
             {/* Bottom Sticky Action Bar */}
             <StickyActionBar
@@ -595,6 +609,13 @@ export function App() {
               onSkipAuto={handleSkipAuto}
               onCancelAuto={handleCancelAuto}
             />
+
+            {generationError && (
+              <div role="alert" className="mb-4 flex items-start justify-between gap-3 rounded-2xl border border-red-200 bg-red-50 px-4 py-3 text-sm font-semibold text-red-700">
+                <span>{generationError}</span>
+                <button type="button" onClick={() => setGenerationError(null)} className="shrink-0 rounded-lg px-2 py-1 text-xs font-black hover:bg-red-100">Đóng</button>
+              </div>
+            )}
 
             {/* Step Toolbar */}
             <StepToolbar

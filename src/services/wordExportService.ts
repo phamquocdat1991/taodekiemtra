@@ -10,6 +10,7 @@ import {
   AlignmentType,
   BorderStyle,
   HeadingLevel,
+  PageOrientation,
 } from "docx";
 import saveAs from "file-saver";
 import JSZip from "jszip";
@@ -21,6 +22,11 @@ import {
   AnswerData,
   DetailGuideData,
 } from "../types";
+import {
+  summarizeAnswerData,
+  summarizeMatrixRows,
+  summarizeSpecificationRows,
+} from "../lib/exportCalculations";
 
 // Standard cell border style
 const cellBorders = {
@@ -82,6 +88,7 @@ export async function generateMatrixDocxBlob(
   config: FullExamState,
   matrix: MatrixData
 ): Promise<Blob> {
+  const totals = summarizeMatrixRows(matrix.rows);
   const headerRows = [
     new TableRow({
       tableHeader: true,
@@ -258,37 +265,37 @@ export async function generateMatrixDocxBlob(
       new TableCell({
         borders: cellBorders,
         shading: { fill: "F2F2F2" },
-        children: [new Paragraph({ alignment: AlignmentType.CENTER, children: [new TextRun({ text: String(matrix.summary.totalNb), bold: true, font: "Times New Roman", size: 22 })] })],
+        children: [new Paragraph({ alignment: AlignmentType.CENTER, children: [new TextRun({ text: String(totals.nb), bold: true, font: "Times New Roman", size: 22 })] })],
       }),
       new TableCell({
         borders: cellBorders,
         shading: { fill: "F2F2F2" },
-        children: [new Paragraph({ alignment: AlignmentType.CENTER, children: [new TextRun({ text: String(matrix.summary.totalTh), bold: true, font: "Times New Roman", size: 22 })] })],
+        children: [new Paragraph({ alignment: AlignmentType.CENTER, children: [new TextRun({ text: String(totals.th), bold: true, font: "Times New Roman", size: 22 })] })],
       }),
       new TableCell({
         borders: cellBorders,
         shading: { fill: "F2F2F2" },
-        children: [new Paragraph({ alignment: AlignmentType.CENTER, children: [new TextRun({ text: String(matrix.summary.totalVd), bold: true, font: "Times New Roman", size: 22 })] })],
+        children: [new Paragraph({ alignment: AlignmentType.CENTER, children: [new TextRun({ text: String(totals.vd), bold: true, font: "Times New Roman", size: 22 })] })],
       }),
       new TableCell({
         borders: cellBorders,
         shading: { fill: "F2F2F2" },
-        children: [new Paragraph({ alignment: AlignmentType.CENTER, children: [new TextRun({ text: String(matrix.summary.totalVdc), bold: true, font: "Times New Roman", size: 22 })] })],
+        children: [new Paragraph({ alignment: AlignmentType.CENTER, children: [new TextRun({ text: String(totals.vdc), bold: true, font: "Times New Roman", size: 22 })] })],
       }),
       new TableCell({
         borders: cellBorders,
         shading: { fill: "F2F2F2" },
-        children: [new Paragraph({ alignment: AlignmentType.CENTER, children: [new TextRun({ text: String(matrix.summary.totalQuestions), bold: true, font: "Times New Roman", size: 22 })] })],
+        children: [new Paragraph({ alignment: AlignmentType.CENTER, children: [new TextRun({ text: String(totals.questions), bold: true, font: "Times New Roman", size: 22 })] })],
       }),
       new TableCell({
         borders: cellBorders,
         shading: { fill: "F2F2F2" },
-        children: [new Paragraph({ alignment: AlignmentType.CENTER, children: [new TextRun({ text: "10,0đ", bold: true, font: "Times New Roman", size: 22 })] })],
+        children: [new Paragraph({ alignment: AlignmentType.CENTER, children: [new TextRun({ text: `${totals.points}đ`, bold: true, font: "Times New Roman", size: 22 })] })],
       }),
       new TableCell({
         borders: cellBorders,
         shading: { fill: "F2F2F2" },
-        children: [new Paragraph({ alignment: AlignmentType.CENTER, children: [new TextRun({ text: "100%", bold: true, font: "Times New Roman", size: 22 })] })],
+        children: [new Paragraph({ alignment: AlignmentType.CENTER, children: [new TextRun({ text: `${totals.percent}%`, bold: true, font: "Times New Roman", size: 22 })] })],
       }),
     ],
   });
@@ -303,6 +310,7 @@ export async function generateMatrixDocxBlob(
       {
         properties: {
           page: {
+            size: { orientation: PageOrientation.LANDSCAPE },
             margin: { top: 1134, bottom: 1134, left: 1417, right: 1134 }, // ~2cm margins
           },
         },
@@ -327,6 +335,7 @@ export async function generateSpecDocxBlob(
   config: FullExamState,
   spec: SpecificationData
 ): Promise<Blob> {
+  const totals = summarizeSpecificationRows(spec.rows);
   const headerRow = new TableRow({
     tableHeader: true,
     children: [
@@ -409,14 +418,14 @@ export async function generateSpecDocxBlob(
     sections: [
       {
         properties: {
-          page: { margin: { top: 1134, bottom: 1134, left: 1417, right: 1134 } },
+          page: { size: { orientation: PageOrientation.LANDSCAPE }, margin: { top: 1134, bottom: 1134, left: 1134, right: 1134 } },
         },
         children: [
           ...createOfficialMoetHeader(
             config.general.department,
             config.general.schoolName,
             "PHỤ LỤC 2: BẢN ĐẶC TẢ ĐỀ KIỂM TRA ĐỊNH KÌ",
-            `Môn: ${config.general.subject} – ${config.general.grade} | Tổng điểm: 10,0 điểm`
+            `Môn: ${config.general.subject} – ${config.general.grade} | ${totals.questions} câu | Tổng điểm: ${totals.points} điểm`
           ),
           table,
         ],
@@ -585,6 +594,7 @@ export async function generateAnswersDocxBlob(
   answers: AnswerData
 ): Promise<Blob> {
   const content: (Paragraph | Table)[] = [];
+  const totals = summarizeAnswerData(answers.parts);
 
   answers.parts.forEach((part) => {
     content.push(
@@ -664,7 +674,7 @@ export async function generateAnswersDocxBlob(
             config.general.department,
             config.general.schoolName,
             "HƯỚNG DẪN CHẤM VÀ BIỂU ĐIỂM",
-            `Môn: ${config.general.subject} – ${config.general.grade} | Tổng điểm: 10,0 điểm`
+            `Môn: ${config.general.subject} – ${config.general.grade} | ${totals.answers} câu | Tổng điểm: ${totals.points} điểm`
           ),
           ...content,
         ],

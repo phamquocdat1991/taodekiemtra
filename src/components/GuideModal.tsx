@@ -11,7 +11,7 @@ export const GuideModal: React.FC<GuideModalProps> = ({ isOpen, onClose }) => {
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-stone-900/50 backdrop-blur-xs animate-in fade-in duration-200">
-      <div className="bg-white rounded-2xl max-w-2xl w-full p-6 md:p-8 shadow-xl border border-[#EFE7DF] relative max-h-[90vh] overflow-y-auto">
+      <div className="bg-white rounded-2xl max-w-2xl w-full p-6 md:p-8 shadow-xl border border-[#e2e8f0] relative max-h-[90vh] overflow-y-auto">
         {/* Close Button */}
         <button
           onClick={onClose}
@@ -21,12 +21,12 @@ export const GuideModal: React.FC<GuideModalProps> = ({ isOpen, onClose }) => {
         </button>
 
         {/* Header */}
-        <div className="flex items-center gap-3.5 mb-6 pb-4 border-b border-[#EFE7DF]">
-          <div className="w-11 h-11 rounded-xl bg-orange-100 text-[#F5730B] flex items-center justify-center font-bold">
+        <div className="flex items-center gap-3.5 mb-6 pb-4 border-b border-[#e2e8f0]">
+          <div className="w-11 h-11 rounded-xl bg-orange-100 text-[#f2a900] flex items-center justify-center font-bold">
             <BookOpen className="w-6 h-6" />
           </div>
           <div>
-            <h3 className="font-bold text-lg md:text-xl text-[#431805]">
+            <h3 className="font-bold text-lg md:text-xl text-[#071a33]">
               Hướng Dẫn Sử Dụng Web App “TẠO ĐỀ KIỂM TRA”
             </h3>
             <p className="text-xs text-stone-500">
@@ -38,9 +38,9 @@ export const GuideModal: React.FC<GuideModalProps> = ({ isOpen, onClose }) => {
         {/* Content */}
         <div className="space-y-4 text-sm text-stone-700 leading-relaxed font-medium">
           {/* Step 1 */}
-          <div className="p-4 rounded-xl bg-[#FAF8F5] border border-[#EFE7DF]">
-            <h4 className="font-bold text-[#8F310C] text-sm flex items-center gap-2 mb-1.5">
-              <span className="w-5 h-5 rounded-full bg-[#F5730B] text-white flex items-center justify-center text-xs font-bold">1</span>
+          <div className="p-4 rounded-xl bg-[#f8fafc] border border-[#e2e8f0]">
+            <h4 className="font-bold text-[#164e7a] text-sm flex items-center gap-2 mb-1.5">
+              <span className="w-5 h-5 rounded-full bg-[#f2a900] text-white flex items-center justify-center text-xs font-bold">1</span>
               Thiết lập cấu hình chung & Mức độ nhận thức
             </h4>
             <p className="text-xs text-stone-600">
@@ -49,9 +49,9 @@ export const GuideModal: React.FC<GuideModalProps> = ({ isOpen, onClose }) => {
           </div>
 
           {/* Step 2 */}
-          <div className="p-4 rounded-xl bg-[#FAF8F5] border border-[#EFE7DF]">
-            <h4 className="font-bold text-[#8F310C] text-sm flex items-center gap-2 mb-1.5">
-              <span className="w-5 h-5 rounded-full bg-[#F5730B] text-white flex items-center justify-center text-xs font-bold">2</span>
+          <div className="p-4 rounded-xl bg-[#f8fafc] border border-[#e2e8f0]">
+            <h4 className="font-bold text-[#164e7a] text-sm flex items-center gap-2 mb-1.5">
+              <span className="w-5 h-5 rounded-full bg-[#f2a900] text-white flex items-center justify-center text-xs font-bold">2</span>
               Nội dung kiến thức & Cấu trúc điểm
             </h4>
             <p className="text-xs text-stone-600">
@@ -60,28 +60,28 @@ export const GuideModal: React.FC<GuideModalProps> = ({ isOpen, onClose }) => {
           </div>
 
           {/* Step 3 */}
-          <div className="p-4 rounded-xl bg-[#FAF8F5] border border-[#EFE7DF]">
-            <h4 className="font-bold text-[#8F310C] text-sm flex items-center gap-2 mb-1.5">
-              <span className="w-5 h-5 rounded-full bg-[#F5730B] text-white flex items-center justify-center text-xs font-bold">3</span>
+          <div className="p-4 rounded-xl bg-[#f8fafc] border border-[#e2e8f0]">
+            <h4 className="font-bold text-[#164e7a] text-sm flex items-center gap-2 mb-1.5">
+              <span className="w-5 h-5 rounded-full bg-[#f2a900] text-white flex items-center justify-center text-xs font-bold">3</span>
               Quy trình 6 bước khảo thí chuẩn mực
             </h4>
             <div className="grid grid-cols-2 sm:grid-cols-3 gap-2 mt-2 text-xs">
-              <div className="p-2 rounded-lg bg-white border border-[#EFE7DF] font-bold text-stone-800">
+              <div className="p-2 rounded-lg bg-white border border-[#e2e8f0] font-bold text-stone-800">
                 1. Khung Ma Trận
               </div>
-              <div className="p-2 rounded-lg bg-white border border-[#EFE7DF] font-bold text-stone-800">
+              <div className="p-2 rounded-lg bg-white border border-[#e2e8f0] font-bold text-stone-800">
                 2. Bản Đặc Tả
               </div>
-              <div className="p-2 rounded-lg bg-white border border-[#EFE7DF] font-bold text-stone-800">
+              <div className="p-2 rounded-lg bg-white border border-[#e2e8f0] font-bold text-stone-800">
                 3. Đề Thi Học Sinh
               </div>
-              <div className="p-2 rounded-lg bg-white border border-[#EFE7DF] font-bold text-stone-800">
+              <div className="p-2 rounded-lg bg-white border border-[#e2e8f0] font-bold text-stone-800">
                 4. Đáp Án & Biểu Điểm
               </div>
-              <div className="p-2 rounded-lg bg-white border border-[#EFE7DF] font-bold text-stone-800">
+              <div className="p-2 rounded-lg bg-white border border-[#e2e8f0] font-bold text-stone-800">
                 5. Hướng Dẫn Sư Phạm
               </div>
-              <div className="p-2 rounded-lg bg-white border border-[#EFE7DF] font-bold text-stone-800">
+              <div className="p-2 rounded-lg bg-white border border-[#e2e8f0] font-bold text-stone-800">
                 6. Tổng Hợp & Xuất Zip
               </div>
             </div>
@@ -100,11 +100,11 @@ export const GuideModal: React.FC<GuideModalProps> = ({ isOpen, onClose }) => {
         </div>
 
         {/* Footer */}
-        <div className="mt-6 pt-4 border-t border-[#EFE7DF] flex justify-end">
+        <div className="mt-6 pt-4 border-t border-[#e2e8f0] flex justify-end">
           <button
             type="button"
             onClick={onClose}
-            className="px-5 py-2.5 rounded-xl text-xs md:text-sm font-bold bg-[#F5730B] hover:bg-[#d96408] text-white transition-all shadow-sm cursor-pointer active:scale-95"
+            className="px-5 py-2.5 rounded-xl text-xs md:text-sm font-bold bg-[#f2a900] hover:bg-[#d96408] text-white transition-all shadow-sm cursor-pointer active:scale-95"
           >
             Đã hiểu, bắt đầu tạo đề
           </button>

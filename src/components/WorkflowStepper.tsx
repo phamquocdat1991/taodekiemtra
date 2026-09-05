@@ -50,11 +50,11 @@ export const WorkflowStepper: React.FC<WorkflowStepperProps> = ({
     <div className="mb-5 space-y-4">
       {/* 1. AUTO MODE ACTIVE BANNER (Nâu đậm) */}
       {autoMode && (
-        <div className="bg-[#381E11] text-white rounded-2xl p-4 md:p-5 shadow-md border border-[#8F310C]/40 animate-in fade-in duration-300">
+        <div className="animate-in fade-in rounded-2xl border border-sky-400/20 bg-[#071a33] p-4 text-white shadow-md duration-300 md:p-5">
           <div className="flex flex-col lg:flex-row items-start lg:items-center justify-between gap-4">
             {/* Left Info */}
             <div className="flex items-center gap-3">
-              <div className="w-11 h-11 rounded-xl bg-[#F5730B] text-white flex items-center justify-center shadow-sm shrink-0">
+              <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-amber-400 text-[#071a33] shadow-sm">
                 <Bot className="w-6 h-6 animate-bounce" />
               </div>
               <div>
@@ -62,11 +62,11 @@ export const WorkflowStepper: React.FC<WorkflowStepperProps> = ({
                   <h3 className="font-black text-sm md:text-base text-white tracking-wide">
                     CHẾ ĐỘ TẠO ĐỀ TỰ ĐỘNG
                   </h3>
-                  <span className="px-2.5 py-0.5 rounded-full text-[10px] font-extrabold bg-[#F5730B] text-white animate-pulse">
+                  <span className="animate-pulse rounded-full bg-amber-400 px-2.5 py-0.5 text-[10px] font-extrabold text-[#071a33]">
                     {autoPaused ? "ĐANG TẠM DỪNG" : "ĐANG TỰ ĐỘNG"}
                   </span>
                 </div>
-                <p className="text-xs text-orange-200 mt-0.5 font-medium">
+                <p className="mt-0.5 text-xs font-medium text-sky-200">
                   {isGenerating
                     ? "Đang xử lý tạo nội dung cho bước tiếp theo..."
                     : autoCountdown !== null
@@ -101,7 +101,7 @@ export const WorkflowStepper: React.FC<WorkflowStepperProps> = ({
               <button
                 type="button"
                 onClick={onSkipAuto}
-                className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-bold bg-[#8F310C] hover:bg-[#a6390e] text-white transition-all shadow-xs active:scale-95"
+                className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-bold bg-[#164e7a] hover:bg-[#a6390e] text-white transition-all shadow-xs active:scale-95"
               >
                 <FastForward className="w-3.5 h-3.5" />
                 <span>CHUYỂN NHANH QUA BƯỚC TIẾP THEO</span>
@@ -122,7 +122,7 @@ export const WorkflowStepper: React.FC<WorkflowStepperProps> = ({
           {autoCountdown !== null && !isGenerating && (
             <div className="w-full bg-stone-900/80 rounded-full h-1.5 mt-3.5 overflow-hidden">
               <div
-                className="bg-[#F5730B] h-1.5 transition-all duration-1000 ease-linear rounded-full"
+                className="bg-[#f2a900] h-1.5 transition-all duration-1000 ease-linear rounded-full"
                 style={{ width: `${((8 - autoCountdown) / 8) * 100}%` }}
               />
             </div>
@@ -131,7 +131,7 @@ export const WorkflowStepper: React.FC<WorkflowStepperProps> = ({
       )}
 
       {/* 2. HORIZONTAL STEPPER CARD (Completed: Xanh mint, Active: Cam, Inactive: Xám) */}
-      <div className="bg-white rounded-2xl shadow-[0_2px_8px_rgba(67,24,5,0.03)] border border-[#EFE7DF] p-3.5 md:p-4 overflow-x-auto">
+      <div className="bg-white rounded-2xl shadow-[0_2px_8px_rgba(7,26,51,0.03)] border border-[#e2e8f0] p-3.5 md:p-4 overflow-x-auto">
         <div className="flex items-center justify-between min-w-[680px] gap-2">
           {steps.map((step, idx) => {
             const isCurrent = currentStep === step.id;
@@ -147,7 +147,7 @@ export const WorkflowStepper: React.FC<WorkflowStepperProps> = ({
                   onClick={() => onStepClick(step.id as WorkflowStep)}
                   className={`flex items-center gap-2 px-3 py-2 rounded-xl transition-all select-none ${
                     isCurrent
-                      ? "bg-orange-50/80 border-2 border-[#F5730B] text-[#F5730B] font-black shadow-2xs"
+                      ? "border-2 border-amber-400 bg-amber-50/80 font-black text-[#8a5700] shadow-2xs"
                       : isCompleted
                       ? "bg-emerald-50/80 border border-emerald-300 text-emerald-800 font-bold hover:bg-emerald-100/70 cursor-pointer"
                       : "bg-stone-50 text-stone-400 border border-transparent cursor-not-allowed opacity-75"
@@ -157,7 +157,7 @@ export const WorkflowStepper: React.FC<WorkflowStepperProps> = ({
                   <div
                     className={`w-6 h-6 rounded-full flex items-center justify-center text-xs font-black shrink-0 ${
                       isCurrent
-                        ? "bg-[#F5730B] text-white shadow-2xs"
+                        ? "bg-amber-400 text-[#071a33] shadow-2xs"
                         : isCompleted
                         ? "bg-[#10B981] text-white shadow-2xs"
                         : "bg-stone-200 text-stone-500"

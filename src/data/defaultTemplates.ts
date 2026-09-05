@@ -1,4 +1,4 @@
-import { FullExamState } from "../types";
+import type { FullExamState } from "../types.ts";
 
 export const initialFullExamState: FullExamState = {
   general: {

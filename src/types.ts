@@ -181,7 +181,9 @@ export interface ExamData {
 
 // Step 4: Đáp án (Answer Key)
 export interface AnswerItem {
+  questionId?: string;
   questionNumber: string | number;
+  correctAnswer?: string | Record<string, string>;
   solutionSummary: string;
   points: number;
   note?: string;
@@ -200,6 +202,7 @@ export interface AnswerData {
 
 // Step 5: Hướng dẫn giải chi tiết (Detailed Guide)
 export interface DetailGuideItem {
+  questionId?: string;
   questionNumber: string | number;
   questionExcerpt: string;
   answer: string;
@@ -244,25 +247,33 @@ export interface ConfigPreset {
 // ─── Phase 2: Online Exam Room ────────────────────────────────────────────────
 
 export interface OnlineRoom {
+  id?: string;
   pin: string;
   createdAt: number;           // timestamp ms
   expiresAt: number;           // timestamp ms (createdAt + duration * 60000)
   config: FullExamState;
   exam: ExamData;
-  answers: AnswerData;
+  status?: "draft" | "open" | "closed" | "expired";
+  answers?: AnswerData;
+  detail?: DetailGuideData | null;
+  attemptId?: string;
+  attemptToken?: string;
 }
 
 // student answers: { questionId -> answer string }
 export type StudentAnswerMap = Record<string, string>;
 
 export interface QuestionResult {
+  questionId: string;
   questionNumber: string | number;
   questionExcerpt: string;
   studentAnswer: string;
   correctAnswer: string;
-  isCorrect: boolean;
+  isCorrect: boolean | null;
   points: number;
   earnedPoints: number;
+  gradingStatus: "correct" | "incorrect" | "pending_review" | "reviewed";
+  teacherComment?: string;
 }
 
 export interface ExamResult {
@@ -270,12 +281,15 @@ export interface ExamResult {
   submittedAt: number;
   totalPoints: number;
   earnedPoints: number;
-  scorePercent: number;
+  scorePercent: number | null;
+  manualReviewPoints?: number;
+  manualReviewRequired?: boolean;
+  status?: "graded" | "pending_teacher_review";
   partResults: Array<{
     partTitle: string;
     earnedPoints: number;
     totalPoints: number;
+    manualReviewPoints?: number;
     questions: QuestionResult[];
   }>;
 }
-

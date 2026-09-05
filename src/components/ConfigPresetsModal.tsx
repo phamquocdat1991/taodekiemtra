@@ -84,7 +84,7 @@ export const ConfigPresetsModal: React.FC<ConfigPresetsModalProps> = ({
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-stone-900/50 backdrop-blur-xs animate-in fade-in duration-200">
-      <div className="bg-white rounded-2xl max-w-2xl w-full p-6 md:p-8 shadow-xl border border-[#EFE7DF] relative max-h-[90vh] overflow-y-auto">
+      <div className="bg-white rounded-2xl max-w-2xl w-full p-6 md:p-8 shadow-xl border border-[#e2e8f0] relative max-h-[90vh] overflow-y-auto">
         {/* Close Button */}
         <button
           onClick={onClose}
@@ -94,12 +94,12 @@ export const ConfigPresetsModal: React.FC<ConfigPresetsModalProps> = ({
         </button>
 
         {/* Header */}
-        <div className="flex items-center gap-3.5 mb-6 pb-4 border-b border-[#EFE7DF]">
-          <div className="w-11 h-11 rounded-xl bg-orange-100 text-[#F5730B] flex items-center justify-center font-bold">
+        <div className="flex items-center gap-3.5 mb-6 pb-4 border-b border-[#e2e8f0]">
+          <div className="w-11 h-11 rounded-xl bg-orange-100 text-[#f2a900] flex items-center justify-center font-bold">
             <FolderHeart className="w-6 h-6" />
           </div>
           <div>
-            <h3 className="font-bold text-lg md:text-xl text-[#431805]">
+            <h3 className="font-bold text-lg md:text-xl text-[#071a33]">
               Quản Lý Cấu Hình Khảo Thí
             </h3>
             <p className="text-xs text-stone-500">
@@ -109,8 +109,8 @@ export const ConfigPresetsModal: React.FC<ConfigPresetsModalProps> = ({
         </div>
 
         {/* Save current config form */}
-        <div className="p-4 rounded-xl bg-[#FAF8F5] border border-[#EFE7DF] mb-6">
-          <label className="block text-xs font-bold text-[#8F310C] uppercase tracking-wider mb-2">
+        <div className="p-4 rounded-xl bg-[#f8fafc] border border-[#e2e8f0] mb-6">
+          <label className="block text-xs font-bold text-[#164e7a] uppercase tracking-wider mb-2">
             Lưu cấu hình hiện tại làm mẫu riêng của Thầy/Cô:
           </label>
           <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2">
@@ -119,13 +119,13 @@ export const ConfigPresetsModal: React.FC<ConfigPresetsModalProps> = ({
               value={newPresetName}
               onChange={(e) => setNewPresetName(e.target.value)}
               placeholder={`VD: Mẫu Đề ${currentState.general.subject} ${currentState.general.grade} ${currentState.general.examType}`}
-              className="flex-1 px-3.5 py-2 rounded-xl border border-[#EFE7DF] bg-white text-xs md:text-sm font-medium text-[#431805] outline-none focus:border-[#F5730B]"
+              className="flex-1 px-3.5 py-2 rounded-xl border border-[#e2e8f0] bg-white text-xs md:text-sm font-medium text-[#071a33] outline-none focus:border-[#f2a900]"
             />
             <button
               type="button"
               onClick={handleSaveCurrent}
               disabled={!newPresetName.trim()}
-              className="inline-flex items-center justify-center gap-1.5 px-4 py-2 rounded-xl text-xs font-bold bg-[#F5730B] hover:bg-[#d96408] text-white disabled:opacity-50 transition-all shrink-0 cursor-pointer active:scale-95"
+              className="inline-flex items-center justify-center gap-1.5 px-4 py-2 rounded-xl text-xs font-bold bg-[#f2a900] hover:bg-[#d96408] text-white disabled:opacity-50 transition-all shrink-0 cursor-pointer active:scale-95"
             >
               {justSaved ? <Check className="w-4 h-4" /> : <Save className="w-4 h-4" />}
               <span>{justSaved ? "Đã lưu!" : "Lưu mẫu"}</span>
@@ -134,13 +134,13 @@ export const ConfigPresetsModal: React.FC<ConfigPresetsModalProps> = ({
         </div>
 
         {/* Tabs */}
-        <div className="flex items-center gap-2 mb-4 border-b border-[#EFE7DF] pb-2">
+        <div className="flex items-center gap-2 mb-4 border-b border-[#e2e8f0] pb-2">
           <button
             type="button"
             onClick={() => setActiveTab("system")}
             className={`px-3.5 py-1.5 rounded-xl text-xs font-bold transition-all cursor-pointer ${
               activeTab === "system"
-                ? "bg-[#431805] text-white"
+                ? "bg-[#071a33] text-white"
                 : "text-stone-600 hover:bg-stone-100"
             }`}
           >
@@ -151,7 +151,7 @@ export const ConfigPresetsModal: React.FC<ConfigPresetsModalProps> = ({
             onClick={() => setActiveTab("custom")}
             className={`px-3.5 py-1.5 rounded-xl text-xs font-bold transition-all cursor-pointer ${
               activeTab === "custom"
-                ? "bg-[#431805] text-white"
+                ? "bg-[#071a33] text-white"
                 : "text-stone-600 hover:bg-stone-100"
             }`}
           >
@@ -165,14 +165,14 @@ export const ConfigPresetsModal: React.FC<ConfigPresetsModalProps> = ({
             defaultPresets.map((preset) => (
               <div
                 key={preset.id}
-                className="p-4 rounded-xl border border-[#EFE7DF] hover:border-orange-300 bg-white hover:bg-orange-50/30 transition-all flex flex-col sm:flex-row sm:items-center justify-between gap-3"
+                className="p-4 rounded-xl border border-[#e2e8f0] hover:border-orange-300 bg-white hover:bg-orange-50/30 transition-all flex flex-col sm:flex-row sm:items-center justify-between gap-3"
               >
                 <div>
                   <div className="flex items-center gap-2">
-                    <span className="font-bold text-[#431805] text-sm">
+                    <span className="font-bold text-[#071a33] text-sm">
                       {preset.name}
                     </span>
-                    <span className="text-[11px] font-bold px-2 py-0.5 rounded-md bg-[#FAF8F5] text-stone-700 border border-[#EFE7DF]">
+                    <span className="text-[11px] font-bold px-2 py-0.5 rounded-md bg-[#f8fafc] text-stone-700 border border-[#e2e8f0]">
                       {preset.state.general.grade}
                     </span>
                   </div>
@@ -187,9 +187,9 @@ export const ConfigPresetsModal: React.FC<ConfigPresetsModalProps> = ({
                     onApplyPreset(preset.state);
                     onClose();
                   }}
-                  className="inline-flex items-center justify-center gap-1.5 px-3.5 py-1.5 rounded-xl text-xs font-bold bg-[#FAF8F5] text-[#8F310C] hover:bg-orange-100 hover:text-[#F5730B] border border-[#EFE7DF] transition-all shrink-0 cursor-pointer"
+                  className="inline-flex items-center justify-center gap-1.5 px-3.5 py-1.5 rounded-xl text-xs font-bold bg-[#f8fafc] text-[#164e7a] hover:bg-orange-100 hover:text-[#f2a900] border border-[#e2e8f0] transition-all shrink-0 cursor-pointer"
                 >
-                  <Sparkles className="w-3.5 h-3.5 text-[#F5730B]" />
+                  <Sparkles className="w-3.5 h-3.5 text-[#f2a900]" />
                   <span>Áp dụng mẫu</span>
                 </button>
               </div>
@@ -204,12 +204,12 @@ export const ConfigPresetsModal: React.FC<ConfigPresetsModalProps> = ({
               savedPresets.map((preset) => (
                 <div
                   key={preset.id}
-                  className="p-4 rounded-xl border border-[#EFE7DF] hover:border-orange-300 bg-white hover:bg-orange-50/30 transition-all flex flex-col sm:flex-row sm:items-center justify-between gap-3"
+                  className="p-4 rounded-xl border border-[#e2e8f0] hover:border-orange-300 bg-white hover:bg-orange-50/30 transition-all flex flex-col sm:flex-row sm:items-center justify-between gap-3"
                 >
                   <div>
                     <div className="flex items-center gap-2">
-                      <Bookmark className="w-4 h-4 text-[#F5730B]" />
-                      <span className="font-bold text-[#431805] text-sm">
+                      <Bookmark className="w-4 h-4 text-[#f2a900]" />
+                      <span className="font-bold text-[#071a33] text-sm">
                         {preset.name}
                       </span>
                       <span className="text-[11px] text-stone-400">
@@ -228,7 +228,7 @@ export const ConfigPresetsModal: React.FC<ConfigPresetsModalProps> = ({
                         onApplyPreset(preset.state);
                         onClose();
                       }}
-                      className="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl text-xs font-bold bg-[#FAF8F5] text-[#8F310C] hover:bg-orange-100 border border-[#EFE7DF] transition-all cursor-pointer"
+                      className="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl text-xs font-bold bg-[#f8fafc] text-[#164e7a] hover:bg-orange-100 border border-[#e2e8f0] transition-all cursor-pointer"
                     >
                       Áp dụng
                     </button>

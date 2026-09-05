@@ -1,6 +1,6 @@
 import React, { useState, useRef, useEffect } from "react";
 import { OnlineRoom } from "../types";
-import { getRoom } from "../services/roomService";
+import { getRoom, joinRoom } from "../services/roomService";
 import {
   ArrowLeft,
   BookOpen,
@@ -41,7 +41,7 @@ export const StudentPortal: React.FC<StudentPortalProps> = ({
   const fullPin = pinDigits.join("").toUpperCase();
 
   const handleDigitChange = (idx: number, val: string) => {
-    const char = val.toUpperCase().replace(/[^A-Z0-9]/g, "").slice(-1);
+    const char = val.toUpperCase().replace(/[^A-HJ-NP-Z2-9]/g, "").slice(-1);
     const newDigits = [...pinDigits];
     newDigits[idx] = char;
     setPinDigits(newDigits);
@@ -69,7 +69,7 @@ export const StudentPortal: React.FC<StudentPortalProps> = ({
     const room = await getRoom(pin);
     setIsLoading(false);
     if (!room) {
-      setError("Khong tim thay phong thi. Vui long kiem tra lai ma PIN.");
+      setError("Không tìm thấy phòng thi. Vui lòng kiểm tra lại mã PIN.");
       setFoundRoom(null);
     } else {
       setFoundRoom(room);
@@ -77,44 +77,53 @@ export const StudentPortal: React.FC<StudentPortalProps> = ({
     }
   };
 
-  const handleStart = () => {
+  const handleStart = async () => {
     if (!foundRoom) return;
     if (!studentName.trim()) {
-      setError("Vui long nhap ho ten truoc khi bat dau lam bai.");
+      setError("Vui lòng nhập họ tên trước khi bắt đầu làm bài.");
       return;
     }
-    onStartExam(foundRoom, studentName.trim());
+    setIsLoading(true);
+    setError("");
+    try {
+      const joinedRoom = await joinRoom(foundRoom.pin, studentName.trim());
+      onStartExam(joinedRoom, studentName.trim());
+    } catch (cause) {
+      setError(cause instanceof Error ? cause.message : "Không thể bắt đầu bài thi.");
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-[#0f0c29] via-[#302b63] to-[#24243e] flex flex-col items-center justify-center p-4">
+    <div className="flex min-h-screen flex-col items-center justify-center bg-gradient-to-br from-[#06172d] via-[#0c3152] to-[#071a33] p-4">
       {/* Back button */}
       <button
         onClick={onBack}
         className="fixed top-4 left-4 flex items-center gap-1.5 px-3 py-2 rounded-xl bg-white/10 hover:bg-white/20 text-white text-xs font-bold transition-all"
       >
         <ArrowLeft className="w-3.5 h-3.5" />
-        Giao vien
+        Giáo viên
       </button>
 
       <div className="w-full max-w-md">
         {/* Logo */}
         <div className="text-center mb-8">
-          <div className="inline-flex w-16 h-16 rounded-2xl bg-gradient-to-br from-violet-500 to-purple-700 items-center justify-center mb-4 shadow-xl shadow-purple-900/50">
-            <Sparkles className="w-8 h-8 text-white" />
+          <div className="mb-4 inline-flex h-16 w-16 items-center justify-center rounded-2xl bg-amber-400 shadow-xl shadow-amber-950/30">
+            <Sparkles className="h-8 w-8 text-[#071a33]" />
           </div>
           <h1 className="text-2xl md:text-3xl font-black text-white tracking-tight">
-            PHONG THI TRUC TUYEN
+            PHÒNG THI TRỰC TUYẾN
           </h1>
           <p className="text-white/50 text-sm font-medium mt-1">
-            Nhap ma PIN de vao phong thi
+            Nhập mã PIN để vào phòng thi
           </p>
         </div>
 
         {/* PIN Input Card */}
         <div className="bg-white/5 backdrop-blur-xl border border-white/10 rounded-3xl p-6 md:p-8 shadow-2xl">
           <label className="block text-white/60 text-xs font-bold uppercase tracking-widest mb-4 text-center">
-            Ma PIN (6 ky tu)
+            Mã PIN (6 ký tự)
           </label>
 
           {/* OTP-style inputs */}
@@ -124,6 +133,7 @@ export const StudentPortal: React.FC<StudentPortalProps> = ({
                 key={idx}
                 ref={(el) => { inputRefs.current[idx] = el; }}
                 type="text"
+                aria-label={`Ký tự PIN ${idx + 1}`}
                 maxLength={1}
                 value={pinDigits[idx]}
                 onChange={(e) => handleDigitChange(idx, e.target.value)}
@@ -134,8 +144,8 @@ export const StudentPortal: React.FC<StudentPortalProps> = ({
                       ? "border-emerald-400 bg-emerald-500/20"
                       : error
                       ? "border-red-400 bg-red-500/10"
-                      : "border-violet-400 bg-violet-500/20"
-                    : "border-white/20 focus:border-violet-400"
+                      : "border-amber-400 bg-amber-500/20"
+                    : "border-white/20 focus:border-amber-400"
                 }`}
               />
             ))}
@@ -165,22 +175,24 @@ export const StudentPortal: React.FC<StudentPortalProps> = ({
               <div className="grid grid-cols-2 gap-2 text-xs">
                 <div className="flex items-center gap-1.5 text-white/60">
                   <Clock className="w-3.5 h-3.5 text-amber-400" />
-                  <span>{foundRoom.config.general.duration} phut</span>
+                  <span>{foundRoom.config.general.duration} phút</span>
                 </div>
                 <div className="flex items-center gap-1.5 text-white/60">
                   <Hash className="w-3.5 h-3.5 text-blue-400" />
-                  <span>{foundRoom.exam.parts.reduce((s, p) => s + p.questions.length, 0)} cau</span>
+                  <span>{foundRoom.exam.parts.reduce((s, p) => s + p.questions.length, 0)} câu</span>
                 </div>
               </div>
 
               {/* Student name input */}
               <div>
-                <label className="block text-white/50 text-[11px] font-bold uppercase tracking-wider mb-1.5">
-                  Ho va ten hoc sinh
+                <label htmlFor="student-name" className="block text-white/50 text-[11px] font-bold uppercase tracking-wider mb-1.5">
+                  Họ và tên học sinh
                 </label>
                 <input
                   type="text"
-                  placeholder="Nguyen Van A"
+                  id="student-name"
+                  autoComplete="name"
+                  placeholder="Nguyễn Văn An"
                   value={studentName}
                   onChange={(e) => {
                     setStudentName(e.target.value);
@@ -194,16 +206,16 @@ export const StudentPortal: React.FC<StudentPortalProps> = ({
 
           {/* Start Button */}
           <button
-            disabled={!foundRoom || !studentName.trim()}
+            disabled={!foundRoom || !studentName.trim() || isLoading}
             onClick={handleStart}
-            className="w-full flex items-center justify-center gap-2.5 py-3.5 rounded-2xl bg-gradient-to-r from-violet-600 to-purple-700 hover:from-violet-500 hover:to-purple-600 text-white font-black text-sm disabled:opacity-40 disabled:cursor-not-allowed transition-all active:scale-95 shadow-lg shadow-purple-900/50"
+            className="flex w-full items-center justify-center gap-2.5 rounded-2xl bg-amber-400 py-3.5 text-sm font-black text-[#071a33] shadow-lg shadow-amber-950/30 transition-all hover:bg-amber-300 active:scale-95 disabled:cursor-not-allowed disabled:opacity-40"
           >
             <PlayCircle className="w-5 h-5" />
-            BAT DAU LAM BAI
+            {isLoading ? "ĐANG KẾT NỐI…" : "BẮT ĐẦU LÀM BÀI"}
           </button>
 
           <p className="text-center text-white/30 text-[11px] font-medium mt-4">
-            He thong chay truc tiep tren trinh duyet, khong can cai dat
+            Hệ thống chạy trực tiếp trên trình duyệt, không cần cài đặt
           </p>
         </div>
       </div>

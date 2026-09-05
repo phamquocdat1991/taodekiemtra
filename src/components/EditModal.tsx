@@ -50,7 +50,7 @@ export const EditModal: React.FC<EditModalProps> = ({
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-stone-900/50 backdrop-blur-xs animate-in fade-in duration-200">
-      <div className="bg-white rounded-2xl max-w-3xl w-full p-6 md:p-8 shadow-xl border border-[#EFE7DF] relative flex flex-col max-h-[90vh]">
+      <div className="bg-white rounded-2xl max-w-3xl w-full p-6 md:p-8 shadow-xl border border-[#e2e8f0] relative flex flex-col max-h-[90vh]">
         {/* Close Button */}
         <button
           onClick={onClose}
@@ -60,12 +60,12 @@ export const EditModal: React.FC<EditModalProps> = ({
         </button>
 
         {/* Header */}
-        <div className="flex items-center gap-3.5 mb-4 pb-3 border-b border-[#EFE7DF]">
-          <div className="w-10 h-10 rounded-xl bg-orange-100 text-[#F5730B] flex items-center justify-center font-bold">
+        <div className="flex items-center gap-3.5 mb-4 pb-3 border-b border-[#e2e8f0]">
+          <div className="w-10 h-10 rounded-xl bg-orange-100 text-[#f2a900] flex items-center justify-center font-bold">
             <Edit3 className="w-5 h-5" />
           </div>
           <div>
-            <h3 className="font-bold text-lg text-[#431805]">
+            <h3 className="font-bold text-lg text-[#071a33]">
               {stepTitles[step] || "Chỉnh sửa nội dung"}
             </h3>
             <p className="text-xs text-stone-500">
@@ -82,7 +82,7 @@ export const EditModal: React.FC<EditModalProps> = ({
               setJsonText(e.target.value);
               if (error) setError(null);
             }}
-            className="flex-1 w-full p-4 rounded-xl border border-[#EFE7DF] bg-[#FAF8F5]/60 focus:bg-white font-mono text-xs text-[#431805] outline-none focus:border-[#F5730B] resize-none transition-all"
+            className="flex-1 w-full p-4 rounded-xl border border-[#e2e8f0] bg-[#f8fafc]/60 focus:bg-white font-mono text-xs text-[#071a33] outline-none focus:border-[#f2a900] resize-none transition-all"
             spellCheck={false}
           />
         </div>
@@ -95,7 +95,7 @@ export const EditModal: React.FC<EditModalProps> = ({
         )}
 
         {/* Footer Actions */}
-        <div className="mt-4 pt-3 border-t border-[#EFE7DF] flex items-center justify-between">
+        <div className="mt-4 pt-3 border-t border-[#e2e8f0] flex items-center justify-between">
           <span className="text-xs text-stone-400">
             * Nhấn "Lưu thay đổi" để cập nhật ngay vào tài liệu
           </span>
@@ -110,7 +110,7 @@ export const EditModal: React.FC<EditModalProps> = ({
             <button
               type="button"
               onClick={handleSave}
-              className="inline-flex items-center gap-1.5 px-5 py-2 rounded-xl text-xs font-bold bg-[#F5730B] hover:bg-[#d96408] text-white transition-all shadow-sm cursor-pointer active:scale-95"
+              className="inline-flex items-center gap-1.5 px-5 py-2 rounded-xl text-xs font-bold bg-[#f2a900] hover:bg-[#d96408] text-white transition-all shadow-sm cursor-pointer active:scale-95"
             >
               <Save className="w-4 h-4" />
               <span>Lưu thay đổi</span>

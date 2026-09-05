@@ -20,29 +20,29 @@ export const DetailStepView: React.FC<DetailStepViewProps> = ({
   }
 
   return (
-    <div className="bg-white rounded-2xl shadow-[0_2px_8px_rgba(67,24,5,0.03)] border border-[#EFE7DF] border-l-4 border-l-[#F5730B] p-5 md:p-8 transition-all">
+    <div className="bg-white rounded-2xl shadow-[0_2px_8px_rgba(7,26,51,0.03)] border border-[#e2e8f0] border-l-4 border-l-[#f2a900] p-5 md:p-8 transition-all">
       {/* Official Header */}
-      <div className="border-b border-[#EFE7DF] pb-5 mb-6">
+      <div className="border-b border-[#e2e8f0] pb-5 mb-6">
         <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 text-xs font-bold text-stone-600 uppercase">
           <div>
             <p className="text-stone-800 font-extrabold">{config.general.department || "SỞ GIÁO DỤC VÀ ĐÀO TẠO"}</p>
             <p className="text-stone-500 font-medium">{config.general.schoolName || "TRƯỜNG THPT CHU VĂN AN"}</p>
           </div>
           <div className="text-left md:text-right">
-            <p className="text-[#8F310C] font-extrabold">CỘNG HÒA XÃ HỘI CHỦ NGHĨA VIỆT NAM</p>
+            <p className="text-[#164e7a] font-extrabold">CỘNG HÒA XÃ HỘI CHỦ NGHĨA VIỆT NAM</p>
             <p className="text-stone-500 font-normal italic">Độc lập - Tự do - Hạnh phúc</p>
           </div>
         </div>
 
         <div className="text-center mt-5">
-          <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold bg-orange-100 text-[#8F310C] mb-2 border border-orange-200">
+          <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold bg-orange-100 text-[#164e7a] mb-2 border border-orange-200">
             <Sparkles className="w-3.5 h-3.5" /> TÀI LIỆU SƯ PHẠM
           </span>
-          <h2 className="text-lg md:text-2xl font-black text-[#431805] uppercase tracking-wide">
+          <h2 className="text-lg md:text-2xl font-black text-[#071a33] uppercase tracking-wide">
             {detail.title || "HƯỚNG DẪN GIẢI CHI TIẾT & LƯU Ý SƯ PHẠM"}
           </h2>
           <p className="text-xs md:text-sm text-stone-600 mt-1 font-medium">
-            Môn: <span className="font-bold text-[#8F310C]">{config.general.subject}</span> – {config.general.grade}
+            Môn: <span className="font-bold text-[#164e7a]">{config.general.subject}</span> – {config.general.grade}
           </p>
         </div>
       </div>
@@ -52,15 +52,15 @@ export const DetailStepView: React.FC<DetailStepViewProps> = ({
         {detail.items.map((item, idx) => (
           <div
             key={idx}
-            className="rounded-xl border border-[#EFE7DF] bg-[#FAF8F5]/40 p-4 md:p-6 shadow-2xs hover:border-orange-200 transition-colors"
+            className="rounded-xl border border-[#e2e8f0] bg-[#f8fafc]/40 p-4 md:p-6 shadow-2xs hover:border-orange-200 transition-colors"
           >
             {/* Question Header */}
-            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 pb-3 mb-3 border-b border-[#EFE7DF]">
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 pb-3 mb-3 border-b border-[#e2e8f0]">
               <div className="flex items-center gap-2">
-                <span className="px-2.5 py-1 rounded-lg bg-[#8F310C] text-white font-black text-xs">
+                <span className="px-2.5 py-1 rounded-lg bg-[#164e7a] text-white font-black text-xs">
                   {item.questionNumber}
                 </span>
-                <span className="font-bold text-[#431805] text-sm md:text-base">
+                <span className="font-bold text-[#071a33] text-sm md:text-base">
                   {item.questionExcerpt}
                 </span>
               </div>
@@ -73,10 +73,10 @@ export const DetailStepView: React.FC<DetailStepViewProps> = ({
             {/* Solution Steps */}
             <div className="space-y-3 text-xs md:text-sm text-stone-800">
               <div>
-                <strong className="text-[#8F310C] block mb-1 font-bold">
+                <strong className="text-[#164e7a] block mb-1 font-bold">
                   • Lời giải chi tiết:
                 </strong>
-                <div className="bg-white p-3.5 rounded-xl border border-[#EFE7DF] whitespace-pre-line leading-relaxed font-medium">
+                <div className="bg-white p-3.5 rounded-xl border border-[#e2e8f0] whitespace-pre-line leading-relaxed font-medium">
                   {item.detailedSolution}
                 </div>
               </div>
@@ -120,24 +120,24 @@ export const DetailStepView: React.FC<DetailStepViewProps> = ({
               {/* Rubric Table if present */}
               {item.rubric && item.rubric.length > 0 && (
                 <div className="mt-3 pt-2">
-                  <span className="text-xs font-bold text-[#431805] uppercase tracking-wider block mb-1.5">
+                  <span className="text-xs font-bold text-[#071a33] uppercase tracking-wider block mb-1.5">
                     Barem chấm chi tiết (Rubric):
                   </span>
-                  <div className="overflow-x-auto rounded-xl border border-[#EFE7DF]">
+                  <div className="overflow-x-auto rounded-xl border border-[#e2e8f0]">
                     <table className="w-full text-left text-xs border-collapse">
-                      <thead className="bg-[#FAF8F5] text-[#431805] font-bold">
+                      <thead className="bg-[#f8fafc] text-[#071a33] font-bold">
                         <tr>
-                          <th className="p-2 border-r border-[#EFE7DF]">Tiêu chí đánh giá</th>
+                          <th className="p-2 border-r border-[#e2e8f0]">Tiêu chí đánh giá</th>
                           <th className="p-2 text-center w-20">Điểm</th>
                         </tr>
                       </thead>
-                      <tbody className="divide-y divide-[#EFE7DF]">
+                      <tbody className="divide-y divide-[#e2e8f0]">
                         {item.rubric.map((r, rIdx) => (
                           <tr key={rIdx} className="hover:bg-orange-50/30">
-                            <td className="p-2 text-stone-700 border-r border-[#EFE7DF] font-medium">
+                            <td className="p-2 text-stone-700 border-r border-[#e2e8f0] font-medium">
                               {r.criterion}
                             </td>
-                            <td className="p-2 text-center font-black text-[#8F310C]">
+                            <td className="p-2 text-center font-black text-[#164e7a]">
                               +{r.points}đ
                             </td>
                           </tr>

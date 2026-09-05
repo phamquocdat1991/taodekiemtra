@@ -42,7 +42,7 @@ export const ApiKeyModal: React.FC<ApiKeyModalProps> = ({
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-stone-900/50 backdrop-blur-xs animate-in fade-in duration-200">
-      <div className="bg-white rounded-2xl max-w-md w-full p-6 shadow-xl border border-[#EFE7DF] relative">
+      <div className="bg-white rounded-2xl max-w-md w-full p-6 shadow-xl border border-[#e2e8f0] relative">
         {/* Close Button */}
         <button
           onClick={onClose}
@@ -53,11 +53,11 @@ export const ApiKeyModal: React.FC<ApiKeyModalProps> = ({
 
         {/* Header */}
         <div className="flex items-center gap-3 mb-4">
-          <div className="w-10 h-10 rounded-xl bg-orange-100 text-[#F5730B] flex items-center justify-center font-bold">
+          <div className="w-10 h-10 rounded-xl bg-orange-100 text-[#f2a900] flex items-center justify-center font-bold">
             <Key className="w-5 h-5" />
           </div>
           <div>
-            <h3 className="font-bold text-lg text-[#431805]">
+            <h3 className="font-bold text-lg text-[#071a33]">
               Nạp API Key Gemini
             </h3>
             <p className="text-xs text-stone-500">
@@ -67,7 +67,7 @@ export const ApiKeyModal: React.FC<ApiKeyModalProps> = ({
         </div>
 
         {/* Info */}
-        <div className="p-3.5 rounded-xl bg-[#FAF8F5] border border-[#EFE7DF] text-xs text-stone-700 space-y-2 mb-4 leading-relaxed font-medium">
+        <div className="p-3.5 rounded-xl bg-[#f8fafc] border border-[#e2e8f0] text-xs text-stone-700 space-y-2 mb-4 leading-relaxed font-medium">
           <p className="flex items-start gap-1.5">
             <ShieldCheck className="w-4 h-4 text-emerald-600 shrink-0 mt-0.5" />
             <span>
@@ -89,7 +89,7 @@ export const ApiKeyModal: React.FC<ApiKeyModalProps> = ({
             value={apiKey}
             onChange={(e) => setApiKey(e.target.value)}
             placeholder="AIzaSy..."
-            className="w-full px-3.5 py-2.5 rounded-xl bg-[#FAF8F5]/60 border border-[#EFE7DF] focus:bg-white focus:border-[#F5730B] focus:ring-2 focus:ring-orange-100 text-sm font-mono text-[#431805] outline-none transition-all"
+            className="w-full px-3.5 py-2.5 rounded-xl bg-[#f8fafc]/60 border border-[#e2e8f0] focus:bg-white focus:border-[#f2a900] focus:ring-2 focus:ring-orange-100 text-sm font-mono text-[#071a33] outline-none transition-all"
           />
         </div>
 
@@ -99,7 +99,7 @@ export const ApiKeyModal: React.FC<ApiKeyModalProps> = ({
             href="https://aistudio.google.com/app/apikey"
             target="_blank"
             rel="noopener noreferrer"
-            className="text-[#F5730B] hover:underline font-bold flex items-center gap-1"
+            className="text-[#f2a900] hover:underline font-bold flex items-center gap-1"
           >
             <span>Lấy khóa API miễn phí tại Google AI Studio</span>
             <ExternalLink className="w-3 h-3" />
@@ -107,7 +107,7 @@ export const ApiKeyModal: React.FC<ApiKeyModalProps> = ({
         </div>
 
         {/* Action Buttons */}
-        <div className="flex items-center justify-between gap-3 pt-3 border-t border-[#EFE7DF]">
+        <div className="flex items-center justify-between gap-3 pt-3 border-t border-[#e2e8f0]">
           {apiKey ? (
             <button
               type="button"
@@ -132,7 +132,7 @@ export const ApiKeyModal: React.FC<ApiKeyModalProps> = ({
             <button
               type="button"
               onClick={handleSave}
-              className="inline-flex items-center gap-1.5 px-5 py-2 rounded-xl text-xs font-bold bg-[#F5730B] hover:bg-[#d96408] text-white transition-all shadow-sm cursor-pointer active:scale-95"
+              className="inline-flex items-center gap-1.5 px-5 py-2 rounded-xl text-xs font-bold bg-[#f2a900] hover:bg-[#d96408] text-white transition-all shadow-sm cursor-pointer active:scale-95"
             >
               {showSavedMsg ? (
                 <>

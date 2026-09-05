@@ -7,12 +7,13 @@ import {
   DetailGuideData,
 } from "../types";
 import {
-  generateSmartMatrix,
-  generateSmartSpecification,
-  generateSmartExam,
-  generateSmartAnswers,
-  generateSmartDetailGuide,
-} from "./mockDataGenerator";
+  assertAnswersValid,
+  assertDetailGuideValid,
+  assertExamValid,
+  assertMatrixValid,
+  assertSpecificationValid,
+} from "../lib/artifactValidation";
+import { invokeFunction } from "../lib/supabase";
 
 export function getCustomApiKey(): string | null {
   try {
@@ -53,7 +54,7 @@ function extractAndParseJSON<T>(rawText: string): T {
       try {
         return JSON.parse(sub);
       } catch (subErr) {
-        console.warn("Regex JSON repair attempt failed, falling back", subErr);
+        console.warn("Không thể trích xuất khối JSON hợp lệ", subErr);
       }
     }
     throw new Error("Không thể phân tích dữ liệu JSON từ AI: " + (err as Error).message);
@@ -62,26 +63,14 @@ function extractAndParseJSON<T>(rawText: string): T {
 
 async function callGeminiApi(prompt: string, systemInstruction?: string): Promise<string> {
   const customApiKey = getCustomApiKey();
-  const response = await fetch("/api/gemini/generate", {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-    },
-    body: JSON.stringify({
+  const data = await invokeFunction<{ result: string }>("generate-content", {
       prompt,
       systemInstruction:
         systemInstruction ||
         "Bạn là chuyên gia khảo thí, soạn thảo đề kiểm tra theo chuẩn Chương trình GDPT 2018 của Bộ Giáo dục và Đào tạo Việt Nam. Bạn PHẢI trả về duy nhất định dạng JSON chuẩn không kèm bất kỳ giải thích Markdown nào bên ngoài.",
       customApiKey,
-    }),
+      temperature: 0.25,
   });
-
-  if (!response.ok) {
-    const errData = await response.json().catch(() => ({}));
-    throw new Error(errData.message || `Lỗi từ máy chủ: ${response.status}`);
-  }
-
-  const data = await response.json();
   return data.result;
 }
 
@@ -140,20 +129,11 @@ Tổng số điểm toàn ma trận PHẢI BẰNG ĐÚNG 10.0 điểm và tổng
     if (!parsed.rows || parsed.rows.length === 0) {
       throw new Error("Ma trận rỗng");
     }
-    // ensure 10 pts and 100%
-    parsed.summary = parsed.summary || {
-      totalNb: parsed.rows.reduce((s, r) => s + (r.nb || 0), 0),
-      totalTh: parsed.rows.reduce((s, r) => s + (r.th || 0), 0),
-      totalVd: parsed.rows.reduce((s, r) => s + (r.vd || 0), 0),
-      totalVdc: parsed.rows.reduce((s, r) => s + (r.vdc || 0), 0),
-      totalQuestions: parsed.rows.reduce((s, r) => s + (r.totalQuestions || 0), 0),
-      totalPoints: 10.0,
-      totalPercent: 100,
-    };
+    assertMatrixValid(config, parsed);
     return parsed;
   } catch (error) {
-    console.warn("AI Generation failed for Matrix, falling back to smart generator:", error);
-    return generateSmartMatrix(config);
+    console.error("Không thể tạo ma trận hợp lệ:", error);
+    throw error;
   }
 }
 
@@ -195,12 +175,11 @@ YÊU CẦU ĐẦU RA JSON:
     if (!parsed.rows || parsed.rows.length === 0) {
       throw new Error("Bản đặc tả rỗng");
     }
-    parsed.totalTime = config.general.duration;
-    parsed.totalPoints = 10.0;
+    assertSpecificationValid(config, matrix, parsed);
     return parsed;
   } catch (error) {
-    console.warn("AI Generation failed for Spec, falling back to smart generator:", error);
-    return generateSmartSpecification(config, matrix);
+    console.error("Không thể tạo bản đặc tả hợp lệ:", error);
+    throw error;
   }
 }
 
@@ -282,11 +261,11 @@ YÊU CẦU ĐẦU RA JSON:
     if (!parsed.parts || parsed.parts.length === 0) {
       throw new Error("Đề thi rỗng");
     }
-    parsed.totalPoints = 10.0;
+    assertExamValid(config, matrix, spec, parsed);
     return parsed;
   } catch (error) {
-    console.warn("AI Generation failed for Exam, falling back to smart generator:", error);
-    return generateSmartExam(config, spec);
+    console.error("Không thể tạo đề thi hợp lệ:", error);
+    throw error;
   }
 }
 
@@ -301,6 +280,12 @@ Dựa vào Đề thi sau đây, hãy tạo ĐÁP ÁN VÀ BIỂU ĐIỂM CHI TI�
 Đề thi:
 ${JSON.stringify(exam)}
 
+QUY TẮC BẮT BUỘC CHO correctAnswer:
+- multipleChoice/listening/language/reading có lựa chọn: chỉ ghi khóa đáp án, ví dụ "A".
+- shortAnswer: chỉ ghi đáp số chuẩn hóa, ví dụ "16".
+- trueFalse: ghi object theo nhãn ý đã bỏ dấu ngoặc, ví dụ {"a":"Đúng","b":"Sai","c":"Đúng","d":"Sai"}.
+- essay/writing: có thể ghi chuỗi rỗng; phần tự luận sẽ do giáo viên duyệt theo rubric.
+
 YÊU CẦU ĐẦU RA JSON:
 {
   "title": "ĐÁP ÁN VÀ BIỂU ĐIỂM ĐỀ KIỂM TRA...",
@@ -310,7 +295,9 @@ YÊU CẦU ĐẦU RA JSON:
       "partTitle": "Tên phần tương ứng trong đề",
       "items": [
         {
+          "questionId": "ID duy nhất của câu tương ứng trong đề",
           "questionNumber": "Câu 1",
+          "correctAnswer": "A",
           "solutionSummary": "Đáp án đúng hoặc Lời giải tóm tắt",
           "points": 0.25,
           "note": "Ghi chú chấm điểm nếu có"
@@ -326,11 +313,11 @@ YÊU CẦU ĐẦU RA JSON:
     if (!parsed.parts || parsed.parts.length === 0) {
       throw new Error("Đáp án rỗng");
     }
-    parsed.totalPoints = 10.0;
+    assertAnswersValid(exam, parsed);
     return parsed;
   } catch (error) {
-    console.warn("AI Generation failed for Answers, falling back to smart generator:", error);
-    return generateSmartAnswers(config, exam);
+    console.error("Không thể tạo đáp án hợp lệ:", error);
+    throw error;
   }
 }
 
@@ -359,6 +346,7 @@ YÊU CẦU ĐẦU RA JSON:
   "title": "HƯỚNG DẪN GIẢI CHI TIẾT VÀ LƯU Ý SƯ PHẠM",
   "items": [
     {
+      "questionId": "ID duy nhất của câu tương ứng trong đề",
       "questionNumber": "Câu 1",
       "questionExcerpt": "Đoạn trích câu hỏi...",
       "answer": "Đáp án",
@@ -378,9 +366,10 @@ YÊU CẦU ĐẦU RA JSON:
     if (!parsed.items || parsed.items.length === 0) {
       throw new Error("Hướng dẫn giải rỗng");
     }
+    assertDetailGuideValid(exam, parsed);
     return parsed;
   } catch (error) {
-    console.warn("AI Generation failed for Detail Guide, falling back to smart generator:", error);
-    return generateSmartDetailGuide(config, exam, answers);
+    console.error("Không thể tạo hướng dẫn giải hợp lệ:", error);
+    throw error;
   }
 }
