@@ -1,4 +1,4 @@
-﻿import express from "express";
+import express from "express";
 import path from "path";
 import { GoogleGenAI } from "@google/genai";
 import { createServer as createViteServer } from "vite";
@@ -190,13 +190,40 @@ async function startServer() {
 
     const prompt = `Ban la chuyen gia su pham Viet Nam. Day la ket qua phan tich bai kiem tra mon ${room.config.general?.subject} lop ${room.config.general?.grade}.\n\nCac diem yeu phat hien:\n${weakPoints.join("\n")}\n\nHay sinh 10 cau luyen tap co muc tieu de khac phuc dung cac lo hong kien thuc tren.\nMoi cau phai:\n1. Khai thac dung diem yeu phat hien\n2. Co 4 lua chon A/B/C/D\n3. Co giai thich ngan\n\nTra ve JSON:\n{"title":"DE LUYEN CUNG CO - ${room.config.general?.subject} ${room.config.general?.grade}","targetedWeaknesses":["mo ta diem yeu 1"],"questions":[{"number":1,"content":"Noi dung cau hoi","options":{"A":"...","B":"...","C":"...","D":"..."},"answer":"A","explanation":"Giai thich ngan gon"}]}`;
 
-    try {
-      const ai = new GoogleGenAI({ apiKey, httpOptions: { headers: { "User-Agent": "aistudio-build" } } });
-      const response = await ai.models.generateContent({ model: "gemini-3.7-flash", contents: prompt, config: { temperature: 0.5, responseMimeType: "application/json" } });
-      return res.json({ result: JSON.parse(response.text || "{}") });
-    } catch (error: any) {
-      return res.status(500).json({ error: "AI_FAILED", message: error?.message });
+    const waterfall = [
+      { model: process.env.GEMINI_MODEL || "gemini-3.8-flash", timeoutMs: 12000 },
+      { model: "gemini-3.7-flash", timeoutMs: 10000 },
+      { model: "gemini-3.6-flash", timeoutMs: 10000 },
+      { model: "gemini-3.5-flash-lite", timeoutMs: 8000 },
+    ];
+
+    const ai = new GoogleGenAI({ apiKey, httpOptions: { headers: { "User-Agent": "aistudio-build" } } });
+    let lastError: any = null;
+
+    for (const candidate of waterfall) {
+      const controller = new AbortController();
+      const timer = setTimeout(() => controller.abort(new Error(`Timeout sau ${candidate.timeoutMs}ms`)), candidate.timeoutMs);
+      try {
+        const response = await ai.models.generateContent({
+          model: candidate.model,
+          contents: prompt,
+          config: {
+            responseMimeType: "application/json",
+            abortSignal: controller.signal,
+          },
+        });
+        clearTimeout(timer);
+        if (response.text) {
+          return res.json({ result: JSON.parse(response.text.trim() || "{}"), meta: { usedModel: candidate.model } });
+        }
+      } catch (err: any) {
+        clearTimeout(timer);
+        lastError = err;
+        console.warn(`[Taodekiemtra Resilience] Model ${candidate.model} gặp sự cố: ${err?.message}, chuyển model dự phòng...`);
+      }
     }
+
+    return res.status(500).json({ error: "AI_FAILED", message: lastError?.message || "Tất cả các model Gemini đều không phản hồi." });
   });
 
   // DELETE /api/rooms/:pin
