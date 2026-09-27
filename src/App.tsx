@@ -617,7 +617,7 @@ export function App() {
               <SpecStepView config={config} spec={spec} />
             )}
             {currentStep === 3 && (
-              <ExamStepView config={config} exam={exam} />
+              <ExamStepView config={config} exam={exam} answers={answers} />
             )}
             {currentStep === 4 && (
               <AnswerStepView config={config} answers={answers} />
@@ -704,6 +704,8 @@ export function App() {
         step={currentStep}
         data={getCurrentStepData()}
         onSave={handleSaveInlineEdit}
+        subject={config.general.subject}
+        grade={config.general.grade}
       />
     </div>
   );

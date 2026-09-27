@@ -69,7 +69,7 @@ export const StudentPortal: React.FC<StudentPortalProps> = ({
     const room = await getRoom(pin);
     setIsLoading(false);
     if (!room) {
-      setError("Khong tim thay phong thi. Vui long kiem tra lai ma PIN.");
+      setError("Không tìm thấy phòng thi. Thầy/Cô và các em vui lòng kiểm tra lại mã PIN.");
       setFoundRoom(null);
     } else {
       setFoundRoom(room);
@@ -80,7 +80,7 @@ export const StudentPortal: React.FC<StudentPortalProps> = ({
   const handleStart = () => {
     if (!foundRoom) return;
     if (!studentName.trim()) {
-      setError("Vui long nhap ho ten truoc khi bat dau lam bai.");
+      setError("Vui lòng nhập họ và tên trước khi bắt đầu làm bài.");
       return;
     }
     onStartExam(foundRoom, studentName.trim());
@@ -94,7 +94,7 @@ export const StudentPortal: React.FC<StudentPortalProps> = ({
         className="fixed top-4 left-4 flex items-center gap-1.5 px-3 py-2 rounded-xl bg-white/10 hover:bg-white/20 text-white text-xs font-bold transition-all"
       >
         <ArrowLeft className="w-3.5 h-3.5" />
-        Giao vien
+        Dành cho Thầy/Cô
       </button>
 
       <div className="w-full max-w-md">
@@ -104,10 +104,10 @@ export const StudentPortal: React.FC<StudentPortalProps> = ({
             <Sparkles className="w-8 h-8 text-white" />
           </div>
           <h1 className="text-2xl md:text-3xl font-black text-white tracking-tight">
-            PHONG THI TRUC TUYEN
+            PHÒNG THI TRỰC TUYẾN
           </h1>
           <p className="text-white/50 text-sm font-medium mt-1">
-            Nhap ma PIN de vao phong thi
+            Nhập mã PIN 6 ký tự để vào phòng làm bài
           </p>
         </div>
 
@@ -165,22 +165,22 @@ export const StudentPortal: React.FC<StudentPortalProps> = ({
               <div className="grid grid-cols-2 gap-2 text-xs">
                 <div className="flex items-center gap-1.5 text-white/60">
                   <Clock className="w-3.5 h-3.5 text-amber-400" />
-                  <span>{foundRoom.config.general.duration} phut</span>
+                  <span>{foundRoom.config.general.duration} phút làm bài</span>
                 </div>
                 <div className="flex items-center gap-1.5 text-white/60">
                   <Hash className="w-3.5 h-3.5 text-blue-400" />
-                  <span>{foundRoom.exam.parts.reduce((s, p) => s + p.questions.length, 0)} cau</span>
+                  <span>{foundRoom.exam.parts.reduce((s, p) => s + p.questions.length, 0)} câu hỏi</span>
                 </div>
               </div>
 
               {/* Student name input */}
               <div>
-                <label className="block text-white/50 text-[11px] font-bold uppercase tracking-wider mb-1.5">
-                  Ho va ten hoc sinh
+                <label className="block text-white/60 text-xs font-bold uppercase tracking-wider mb-1.5">
+                  Họ và tên thí sinh:
                 </label>
                 <input
                   type="text"
-                  placeholder="Nguyen Van A"
+                  placeholder="VD: Nguyễn Văn An"
                   value={studentName}
                   onChange={(e) => {
                     setStudentName(e.target.value);
@@ -196,10 +196,10 @@ export const StudentPortal: React.FC<StudentPortalProps> = ({
           <button
             disabled={!foundRoom || !studentName.trim()}
             onClick={handleStart}
-            className="w-full flex items-center justify-center gap-2.5 py-3.5 rounded-2xl bg-gradient-to-r from-violet-600 to-purple-700 hover:from-violet-500 hover:to-purple-600 text-white font-black text-sm disabled:opacity-40 disabled:cursor-not-allowed transition-all active:scale-95 shadow-lg shadow-purple-900/50"
+            className="w-full flex items-center justify-center gap-2.5 py-3.5 rounded-2xl bg-gradient-to-r from-violet-600 to-purple-700 hover:from-violet-500 hover:to-purple-600 text-white font-black text-sm disabled:opacity-40 disabled:cursor-not-allowed transition-all active:scale-95 shadow-lg shadow-purple-900/50 cursor-pointer"
           >
             <PlayCircle className="w-5 h-5" />
-            BAT DAU LAM BAI
+            BẮT ĐẦU LÀM BÀI THI
           </button>
 
           <p className="text-center text-white/30 text-[11px] font-medium mt-4">

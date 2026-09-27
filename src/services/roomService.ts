@@ -1,4 +1,4 @@
-﻿import { FullExamState, ExamData, AnswerData, OnlineRoom, StudentAnswerMap, ExamResult } from "../types";
+import { FullExamState, ExamData, AnswerData, OnlineRoom, StudentAnswerMap, ExamResult } from "../types";
 
 // Detect if server API is available
 let _serverAvailable: boolean | null = null;
@@ -64,14 +64,15 @@ export function getRoomSync(pin: string): OnlineRoom | null {
 export async function submitAnswers(
   pin: string,
   studentName: string,
-  answers: StudentAnswerMap
+  answers: StudentAnswerMap,
+  tabSwitchCount: number = 0
 ): Promise<ExamResult | null> {
   if (await isServerAvailable()) {
     try {
       const r = await fetch(`/api/rooms/${pin.toUpperCase()}/submit`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ studentName, answers }),
+        body: JSON.stringify({ studentName, answers, tabSwitchCount }),
       });
       if (r.ok) {
         const data = await r.json();
@@ -154,6 +155,7 @@ export interface ClassroomResults {
     earnedPoints: number;
     totalPoints: number;
     scorePercent: number;
+    tabSwitchCount?: number;
     partResults: any[];
   }>;
   topWrongQuestions: Array<{ questionNumber: string; wrongCount: number; wrongPercent: number; excerpt: string }>;

@@ -1,6 +1,7 @@
 import React from "react";
 import { FullExamState, AnswerData } from "../types";
 import { CheckCircle2, Award } from "lucide-react";
+import { MathRenderer } from "./MathRenderer";
 
 interface AnswerStepViewProps {
   config: FullExamState;
@@ -72,7 +73,7 @@ export const AnswerStepView: React.FC<AnswerStepViewProps> = ({
                         {item.questionNumber}
                       </td>
                       <td className="p-3 text-stone-800 border-r border-[#EFE7DF] font-medium leading-relaxed">
-                        {item.solutionSummary}
+                        <MathRenderer text={item.solutionSummary} />
                       </td>
                       <td className="p-3 text-center font-black text-[#8F310C] border-r border-[#EFE7DF]">
                         {item.points}đ

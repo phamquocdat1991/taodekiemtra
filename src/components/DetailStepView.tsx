@@ -1,6 +1,7 @@
 import React from "react";
 import { FullExamState, DetailGuideData } from "../types";
 import { Award, AlertTriangle, BookCheck, Sparkles, Brain } from "lucide-react";
+import { MathRenderer } from "./MathRenderer";
 
 interface DetailStepViewProps {
   config: FullExamState;
@@ -61,12 +62,12 @@ export const DetailStepView: React.FC<DetailStepViewProps> = ({
                   {item.questionNumber}
                 </span>
                 <span className="font-bold text-[#431805] text-sm md:text-base">
-                  {item.questionExcerpt}
+                  <MathRenderer text={item.questionExcerpt} />
                 </span>
               </div>
               <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-xl bg-emerald-50 text-emerald-800 border border-emerald-200 font-bold text-xs self-start sm:self-center">
                 <BookCheck className="w-3.5 h-3.5 text-emerald-600" />
-                <span>Đáp án: {item.answer}</span>
+                <span>Đáp án: <MathRenderer text={item.answer} /></span>
               </div>
             </div>
 
@@ -76,15 +77,15 @@ export const DetailStepView: React.FC<DetailStepViewProps> = ({
                 <strong className="text-[#8F310C] block mb-1 font-bold">
                   • Lời giải chi tiết:
                 </strong>
-                <div className="bg-white p-3.5 rounded-xl border border-[#EFE7DF] whitespace-pre-line leading-relaxed font-medium">
-                  {item.detailedSolution}
+                <div className="bg-white p-3.5 rounded-xl border border-[#EFE7DF] leading-relaxed font-medium">
+                  <MathRenderer text={item.detailedSolution} />
                 </div>
               </div>
 
               {/* Knowledge Used */}
               <div className="flex items-start gap-2 pt-1 font-medium">
                 <strong className="text-stone-700 shrink-0 font-bold">• Kiến thức áp dụng:</strong>
-                <span className="text-stone-600 italic">{item.knowledgeUsed}</span>
+                <span className="text-stone-600 italic"><MathRenderer text={item.knowledgeUsed} /></span>
               </div>
 
               {/* Trap Analysis – Bẫy tư duy & Lỗ hổng nhận thức */}
@@ -96,7 +97,7 @@ export const DetailStepView: React.FC<DetailStepViewProps> = ({
                       ⚠️ Bẫy tư duy & Lỗ hổng nhận thức:
                     </span>
                     <span className="text-xs text-violet-800 leading-relaxed font-medium">
-                      {item.trapAnalysis}
+                      <MathRenderer text={item.trapAnalysis} />
                     </span>
                   </div>
                 </div>

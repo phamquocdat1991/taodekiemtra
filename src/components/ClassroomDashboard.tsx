@@ -1,9 +1,11 @@
-﻿import React, { useState, useEffect, useCallback } from "react";
+import React, { useState, useEffect, useCallback } from "react";
+import * as XLSX from "xlsx";
 import { getRoomResults, generateRemedialTest, ClassroomResults, RemedialTest } from "../services/roomService";
 import { getCustomApiKey } from "../services/geminiService";
 import {
   BarChart3, Users, Trophy, AlertTriangle, RefreshCw,
   Brain, CheckCircle2, XCircle, Clock, Zap, X, ChevronDown, ChevronUp,
+  FileSpreadsheet, ShieldAlert, Download,
 } from "lucide-react";
 
 interface ClassroomDashboardProps {
@@ -70,6 +72,39 @@ export const ClassroomDashboard: React.FC<ClassroomDashboardProps> = ({ pin, onC
     );
   }
 
+  const handleExportExcel = () => {
+    if (!data || data.submissions.length === 0) return;
+
+    const rows = data.submissions.map((s, idx) => {
+      const earned = s.earnedPoints;
+      let rank = "Chưa đạt";
+      if (earned >= 9) rank = "Xuất sắc";
+      else if (earned >= 8) rank = "Giỏi";
+      else if (earned >= 6.5) rank = "Khá";
+      else if (earned >= 5) rank = "Trung bình";
+
+      return {
+        "STT": idx + 1,
+        "Họ và tên học sinh": s.studentName,
+        "Điểm số": earned,
+        "Thang điểm": s.totalPoints,
+        "Tỷ lệ đúng (%)": s.scorePercent,
+        "Xếp loại": rank,
+        "Số lần rời màn hình": s.tabSwitchCount || 0,
+        "Thời gian nộp": new Date(s.submittedAt).toLocaleTimeString("vi-VN"),
+      };
+    });
+
+    const worksheet = XLSX.utils.json_to_sheet(rows);
+    const workbook = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(workbook, worksheet, "Bang_Diem_Lop");
+
+    XLSX.writeFile(
+      workbook,
+      `Bang_Diem_Phong_Thi_${pin}_${data.roomInfo?.subject || "Mon"}_${data.roomInfo?.grade || ""}.xlsx`
+    );
+  };
+
   const avgScore = data.submissions.length > 0
     ? data.submissions.reduce((s, sub) => s + sub.earnedPoints, 0) / data.submissions.length
     : 0;
@@ -86,11 +121,11 @@ export const ClassroomDashboard: React.FC<ClassroomDashboardProps> = ({ pin, onC
 
   const gradeLabel = (pts: number) => {
     const pct = pts / totalPoints;
-    if (pct >= 0.9) return { label: "Xuat sac", color: "text-emerald-400" };
-    if (pct >= 0.8) return { label: "Gioi", color: "text-green-400" };
-    if (pct >= 0.65) return { label: "Kha", color: "text-amber-400" };
-    if (pct >= 0.5) return { label: "TB", color: "text-orange-400" };
-    return { label: "Yeu", color: "text-red-400" };
+    if (pct >= 0.9) return { label: "Xuất sắc", color: "text-emerald-400" };
+    if (pct >= 0.8) return { label: "Giỏi", color: "text-green-400" };
+    if (pct >= 0.65) return { label: "Khá", color: "text-amber-400" };
+    if (pct >= 0.5) return { label: "Trung bình", color: "text-orange-400" };
+    return { label: "Chưa đạt", color: "text-red-400" };
   };
 
   return (
@@ -103,14 +138,24 @@ export const ClassroomDashboard: React.FC<ClassroomDashboardProps> = ({ pin, onC
               <BarChart3 className="w-5 h-5 text-violet-400" />
             </div>
             <div>
-              <h2 className="text-white font-black text-base">Dashboard Lop Hoc</h2>
+              <h2 className="text-white font-black text-base">Dashboard Phòng Thi & Giám Thị</h2>
               <p className="text-white/40 text-xs">{data.roomInfo.subject} – {data.roomInfo.grade} | PIN: <span className="font-mono font-bold text-violet-300">{pin}</span></p>
             </div>
           </div>
           <div className="flex items-center gap-2">
+            <button
+              type="button"
+              onClick={handleExportExcel}
+              disabled={!data || data.submissions.length === 0}
+              className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-emerald-600/30 hover:bg-emerald-600/50 text-emerald-300 border border-emerald-500/40 text-xs font-bold transition-all disabled:opacity-40 cursor-pointer"
+              title="Xuất bảng điểm lớp ra tệp Excel (.xlsx)"
+            >
+              <FileSpreadsheet className="w-3.5 h-3.5" />
+              <span>Xuất Excel (.xlsx)</span>
+            </button>
             <div className="flex items-center gap-1.5 text-white/30 text-[11px]">
               <RefreshCw className="w-3 h-3 animate-spin" />
-              Tu dong cap nhat
+              Tự động cập nhật
             </div>
             <button onClick={onClose} className="w-8 h-8 rounded-xl bg-white/10 hover:bg-white/20 flex items-center justify-center text-white">
               <X className="w-4 h-4" />
@@ -190,7 +235,7 @@ export const ClassroomDashboard: React.FC<ClassroomDashboardProps> = ({ pin, onC
             <div className="bg-white/5 border border-white/10 rounded-2xl overflow-hidden">
               <div className="px-4 py-3 border-b border-white/10">
                 <h3 className="text-white font-bold text-sm flex items-center gap-2">
-                  <Users className="w-4 h-4 text-violet-400" /> Danh sach hoc sinh da nop bai ({data.submissionCount})
+                  <Users className="w-4 h-4 text-violet-400" /> Danh sách học sinh đã nộp bài ({data.submissionCount})
                 </h3>
               </div>
               <div className="divide-y divide-white/5 max-h-64 overflow-y-auto">
@@ -205,8 +250,17 @@ export const ClassroomDashboard: React.FC<ClassroomDashboardProps> = ({ pin, onC
                       >
                         <span className="text-white/30 text-xs w-5 text-center font-bold">{i + 1}</span>
                         <span className="text-white font-medium text-sm flex-1 truncate">{sub.studentName}</span>
+                        {/* Tab switch warning badge */}
+                        {sub.tabSwitchCount && sub.tabSwitchCount > 0 ? (
+                          <span className="flex items-center gap-1 text-[11px] font-bold text-amber-300 bg-amber-500/20 px-2 py-0.5 rounded-lg border border-amber-500/30" title="Số lần rời khỏi màn hình làm bài">
+                            <ShieldAlert className="w-3 h-3 text-amber-400" />
+                            <span>{sub.tabSwitchCount} lần</span>
+                          </span>
+                        ) : (
+                          <span className="text-[11px] text-emerald-400/80 font-medium">✓ Nghiêm túc</span>
+                        )}
                         <span className={`text-xs font-bold ${g.color}`}>{g.label}</span>
-                        <span className="text-white font-black text-sm w-16 text-right">{sub.earnedPoints.toFixed(1)}/{sub.totalPoints}d</span>
+                        <span className="text-white font-black text-sm w-16 text-right">{sub.earnedPoints.toFixed(1)}/{sub.totalPoints}đ</span>
                         {isExpanded ? <ChevronUp className="w-3 h-3 text-white/30" /> : <ChevronDown className="w-3 h-3 text-white/30" />}
                       </button>
                       {isExpanded && (

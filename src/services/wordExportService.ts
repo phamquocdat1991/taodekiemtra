@@ -21,6 +21,7 @@ import {
   AnswerData,
   DetailGuideData,
 } from "../types";
+import { ExamShufflerResult } from "../lib/examShuffler";
 
 // Standard cell border style
 const cellBorders = {
@@ -41,7 +42,14 @@ function createOfficialMoetHeader(
       alignment: AlignmentType.CENTER,
       children: [
         new TextRun({
-          text: `${(department || "SỞ GIÁO DỤC VÀ ĐÀO TẠO").toUpperCase()}\n${(schoolName || "TRƯỜNG THPT CHU VĂN AN").toUpperCase()}`,
+          text: (department || "SỞ GIÁO DỤC VÀ ĐÀO TẠO").toUpperCase(),
+          bold: true,
+          font: "Times New Roman",
+          size: 22,
+          break: 1,
+        }),
+        new TextRun({
+          text: (schoolName || "TRƯỜNG THPT CHU VĂN AN").toUpperCase(),
           bold: true,
           font: "Times New Roman",
           size: 24,
@@ -794,4 +802,322 @@ export async function exportAllFilesZip(
 
   const zipBlob = await zip.generateAsync({ type: "blob" });
   saveAs(zipBlob, `Bo_De_${baseName}.zip`);
+}
+
+// 6. Export MOET Official Answer Sheet (Phiếu trả lời trắc nghiệm)
+export async function generateAnswerSheetDocxBlob(
+  config: FullExamState,
+  exam: ExamData
+): Promise<Blob> {
+  // Count questions in each part
+  let mcCount = 0;
+  let tfCount = 0;
+  let saCount = 0;
+
+  exam.parts.forEach((p) => {
+    p.questions.forEach((q) => {
+      const type = q.type || (q.options ? "multipleChoice" : q.subQuestions ? "trueFalse" : "shortAnswer");
+      if (type === "multipleChoice") mcCount++;
+      else if (type === "trueFalse") tfCount++;
+      else if (type === "shortAnswer") saCount++;
+    });
+  });
+
+  // Candidate Info Table (2 columns: Left = Candidate info, Right = SBD & Exam Code)
+  const infoTable = new Table({
+    width: { size: 100, type: WidthType.PERCENTAGE },
+    rows: [
+      new TableRow({
+        children: [
+          new TableCell({
+            width: { size: 6000, type: WidthType.DXA },
+            borders: cellBorders,
+            children: [
+              new Paragraph({
+                children: [
+                  new TextRun({ text: "Họ và tên thí sinh: .............................................................", font: "Times New Roman", size: 22 }),
+                ],
+                spacing: { before: 60, after: 60 },
+              }),
+              new Paragraph({
+                children: [
+                  new TextRun({ text: "Ngày sinh: ...../...../.........   Lớp: ...............   Phòng thi: ........", font: "Times New Roman", size: 22 }),
+                ],
+                spacing: { after: 60 },
+              }),
+              new Paragraph({
+                children: [
+                  new TextRun({ text: "Trường: " + (config.general.schoolName || "........................................................"), font: "Times New Roman", size: 22 }),
+                ],
+                spacing: { after: 60 },
+              }),
+            ],
+          }),
+          new TableCell({
+            width: { size: 4000, type: WidthType.DXA },
+            borders: cellBorders,
+            children: [
+              new Paragraph({
+                alignment: AlignmentType.CENTER,
+                children: [
+                  new TextRun({ text: "SỐ BÁO DANH", bold: true, font: "Times New Roman", size: 22 }),
+                ],
+              }),
+              new Paragraph({
+                alignment: AlignmentType.CENTER,
+                children: [
+                  new TextRun({ text: "[   ] [   ] [   ] [   ] [   ] [   ]", font: "Times New Roman", size: 22 }),
+                ],
+                spacing: { after: 60 },
+              }),
+              new Paragraph({
+                alignment: AlignmentType.CENTER,
+                children: [
+                  new TextRun({ text: "MÃ ĐỀ THI: [   ] [   ] [   ]", bold: true, font: "Times New Roman", size: 22 }),
+                ],
+              }),
+            ],
+          }),
+        ],
+      }),
+    ],
+  });
+
+  // Section I: Multiple Choice Grid (4 columns layout)
+  const mcRows: TableRow[] = [
+    new TableRow({
+      tableHeader: true,
+      children: [
+        new TableCell({ borders: cellBorders, shading: { fill: "EAEAEA" }, children: [new Paragraph({ alignment: AlignmentType.CENTER, children: [new TextRun({ text: "Câu", bold: true, font: "Times New Roman", size: 20 })] })] }),
+        new TableCell({ borders: cellBorders, shading: { fill: "EAEAEA" }, children: [new Paragraph({ alignment: AlignmentType.CENTER, children: [new TextRun({ text: "Phương án tô", bold: true, font: "Times New Roman", size: 20 })] })] }),
+        new TableCell({ borders: cellBorders, shading: { fill: "EAEAEA" }, children: [new Paragraph({ alignment: AlignmentType.CENTER, children: [new TextRun({ text: "Câu", bold: true, font: "Times New Roman", size: 20 })] })] }),
+        new TableCell({ borders: cellBorders, shading: { fill: "EAEAEA" }, children: [new Paragraph({ alignment: AlignmentType.CENTER, children: [new TextRun({ text: "Phương án tô", bold: true, font: "Times New Roman", size: 20 })] })] }),
+      ],
+    }),
+  ];
+
+  const half = Math.ceil(mcCount / 2);
+  for (let i = 1; i <= half; i++) {
+    const rightIdx = i + half;
+    mcRows.push(
+      new TableRow({
+        children: [
+          new TableCell({ borders: cellBorders, children: [new Paragraph({ alignment: AlignmentType.CENTER, children: [new TextRun({ text: String(i), bold: true, font: "Times New Roman", size: 20 })] })] }),
+          new TableCell({ borders: cellBorders, children: [new Paragraph({ alignment: AlignmentType.CENTER, children: [new TextRun({ text: " [ A ]   [ B ]   [ C ]   [ D ] ", font: "Times New Roman", size: 20 })] })] }),
+          new TableCell({ borders: cellBorders, children: [new Paragraph({ alignment: AlignmentType.CENTER, children: [new TextRun({ text: rightIdx <= mcCount ? String(rightIdx) : "", bold: true, font: "Times New Roman", size: 20 })] })] }),
+          new TableCell({ borders: cellBorders, children: [new Paragraph({ alignment: AlignmentType.CENTER, children: [new TextRun({ text: rightIdx <= mcCount ? " [ A ]   [ B ]   [ C ]   [ D ] " : "", font: "Times New Roman", size: 20 })] })] }),
+        ],
+      })
+    );
+  }
+
+  const mcTable = new Table({
+    width: { size: 100, type: WidthType.PERCENTAGE },
+    rows: mcRows,
+  });
+
+  // Section II: True/False Grid
+  const tfRows: TableRow[] = [
+    new TableRow({
+      tableHeader: true,
+      children: [
+        new TableCell({ borders: cellBorders, shading: { fill: "EAEAEA" }, children: [new Paragraph({ alignment: AlignmentType.CENTER, children: [new TextRun({ text: "Câu hỏi", bold: true, font: "Times New Roman", size: 20 })] })] }),
+        new TableCell({ borders: cellBorders, shading: { fill: "EAEAEA" }, children: [new Paragraph({ alignment: AlignmentType.CENTER, children: [new TextRun({ text: "Lệnh a", bold: true, font: "Times New Roman", size: 20 })] })] }),
+        new TableCell({ borders: cellBorders, shading: { fill: "EAEAEA" }, children: [new Paragraph({ alignment: AlignmentType.CENTER, children: [new TextRun({ text: "Lệnh b", bold: true, font: "Times New Roman", size: 20 })] })] }),
+        new TableCell({ borders: cellBorders, shading: { fill: "EAEAEA" }, children: [new Paragraph({ alignment: AlignmentType.CENTER, children: [new TextRun({ text: "Lệnh c", bold: true, font: "Times New Roman", size: 20 })] })] }),
+        new TableCell({ borders: cellBorders, shading: { fill: "EAEAEA" }, children: [new Paragraph({ alignment: AlignmentType.CENTER, children: [new TextRun({ text: "Lệnh d", bold: true, font: "Times New Roman", size: 20 })] })] }),
+      ],
+    }),
+  ];
+
+  for (let i = 1; i <= tfCount; i++) {
+    tfRows.push(
+      new TableRow({
+        children: [
+          new TableCell({ borders: cellBorders, children: [new Paragraph({ alignment: AlignmentType.CENTER, children: [new TextRun({ text: `Câu ${i}`, bold: true, font: "Times New Roman", size: 20 })] })] }),
+          new TableCell({ borders: cellBorders, children: [new Paragraph({ alignment: AlignmentType.CENTER, children: [new TextRun({ text: "[Đ] [S]", font: "Times New Roman", size: 20 })] })] }),
+          new TableCell({ borders: cellBorders, children: [new Paragraph({ alignment: AlignmentType.CENTER, children: [new TextRun({ text: "[Đ] [S]", font: "Times New Roman", size: 20 })] })] }),
+          new TableCell({ borders: cellBorders, children: [new Paragraph({ alignment: AlignmentType.CENTER, children: [new TextRun({ text: "[Đ] [S]", font: "Times New Roman", size: 20 })] })] }),
+          new TableCell({ borders: cellBorders, children: [new Paragraph({ alignment: AlignmentType.CENTER, children: [new TextRun({ text: "[Đ] [S]", font: "Times New Roman", size: 20 })] })] }),
+        ],
+      })
+    );
+  }
+
+  const tfTable = new Table({
+    width: { size: 100, type: WidthType.PERCENTAGE },
+    rows: tfRows,
+  });
+
+  const doc = new Document({
+    sections: [
+      {
+        properties: {
+          page: { margin: { top: 900, bottom: 900, left: 1100, right: 1100 } },
+        },
+        children: [
+          new Paragraph({
+            alignment: AlignmentType.CENTER,
+            children: [
+              new TextRun({
+                text: `${(config.general.department || "SỞ GIÁO DỤC VÀ ĐÀO TẠO").toUpperCase()} - ${(config.general.schoolName || "TRƯỜNG THPT CHU VĂN AN").toUpperCase()}`,
+                bold: true,
+                font: "Times New Roman",
+                size: 22,
+                break: 1,
+              }),
+              new TextRun({
+                text: "PHIẾU TRẢ LỜI TRẮC NGHIỆM",
+                bold: true,
+                font: "Times New Roman",
+                size: 26,
+                color: "000000",
+              }),
+            ],
+            spacing: { after: 120 },
+          }),
+          infoTable,
+          new Paragraph({
+            children: [
+              new TextRun({
+                text: "PHẦN I. CÂU HỎI TRẮC NGHIỆM NHIỀU LỰA CHỌN (Tô đậm vào ô tròn chứa phương án đúng)",
+                bold: true,
+                font: "Times New Roman",
+                size: 22,
+              }),
+            ],
+            spacing: { before: 180, after: 100 },
+          }),
+          mcTable,
+          ...(tfCount > 0
+            ? [
+                new Paragraph({
+                  children: [
+                    new TextRun({
+                      text: "PHẦN II. CÂU HỎI TRẮC NGHIỆM ĐÚNG/SAI (Tô [Đ] nếu đúng, tô [S] nếu sai)",
+                      bold: true,
+                      font: "Times New Roman",
+                      size: 22,
+                    }),
+                  ],
+                  spacing: { before: 180, after: 100 },
+                }),
+                tfTable,
+              ]
+            : []),
+        ],
+      },
+    ],
+  });
+
+  return Packer.toBlob(doc);
+}
+
+// 7. Export Comparison Matrix Docx for 4 Exam Codes
+export async function generateComparisonMatrixDocxBlob(
+  config: FullExamState,
+  shuffleResult: ExamShufflerResult
+): Promise<Blob> {
+  const headerCells = [
+    new TableCell({
+      width: { size: 800, type: WidthType.DXA },
+      borders: cellBorders,
+      shading: { fill: "D9E1F2" },
+      children: [new Paragraph({ alignment: AlignmentType.CENTER, children: [new TextRun({ text: "Câu", bold: true, font: "Times New Roman", size: 22 })] })],
+    }),
+    new TableCell({
+      width: { size: 3600, type: WidthType.DXA },
+      borders: cellBorders,
+      shading: { fill: "D9E1F2" },
+      children: [new Paragraph({ alignment: AlignmentType.CENTER, children: [new TextRun({ text: "Trích đoạn nội dung câu hỏi", bold: true, font: "Times New Roman", size: 22 })] })],
+    }),
+    ...shuffleResult.codes.map(
+      (code) =>
+        new TableCell({
+          width: { size: 1400, type: WidthType.DXA },
+          borders: cellBorders,
+          shading: { fill: "D9E1F2" },
+          children: [new Paragraph({ alignment: AlignmentType.CENTER, children: [new TextRun({ text: `Mã ${code}`, bold: true, font: "Times New Roman", size: 22 })] })],
+        })
+    ),
+  ];
+
+  const dataRows = shuffleResult.comparisonMatrix.map((row) => {
+    return new TableRow({
+      children: [
+        new TableCell({
+          borders: cellBorders,
+          children: [new Paragraph({ alignment: AlignmentType.CENTER, children: [new TextRun({ text: String(row.stt), bold: true, font: "Times New Roman", size: 22 })] })],
+        }),
+        new TableCell({
+          borders: cellBorders,
+          children: [new Paragraph({ children: [new TextRun({ text: row.questionExcerpt, font: "Times New Roman", size: 20 })] })],
+        }),
+        ...shuffleResult.codes.map(
+          (code) =>
+            new TableCell({
+              borders: cellBorders,
+              children: [new Paragraph({ alignment: AlignmentType.CENTER, children: [new TextRun({ text: row.keysByCode[code] || "-", bold: true, font: "Times New Roman", size: 22, color: "002060" })] })],
+            })
+        ),
+      ],
+    });
+  });
+
+  const table = new Table({
+    width: { size: 100, type: WidthType.PERCENTAGE },
+    rows: [new TableRow({ tableHeader: true, children: headerCells }), ...dataRows],
+  });
+
+  const doc = new Document({
+    sections: [
+      {
+        properties: {
+          page: { margin: { top: 1134, bottom: 1134, left: 1417, right: 1134 } },
+        },
+        children: [
+          ...createOfficialMoetHeader(
+            config.general.department,
+            config.general.schoolName,
+            "BẢNG MA TRẬN ĐỐI CHIẾU ĐÁP ÁN CÁC MÃ ĐỀ",
+            `Môn: ${config.general.subject} – ${config.general.grade} | Áp dụng cho 4 mã đề: ${shuffleResult.codes.join(", ")}`
+          ),
+          table,
+        ],
+      },
+    ],
+  });
+
+  return Packer.toBlob(doc);
+}
+
+// 8. Export 4 Shuffled Exam Variants as a single ZIP package
+export async function exportShuffledVariantsZip(
+  config: FullExamState,
+  shuffleResult: ExamShufflerResult
+): Promise<void> {
+  const zip = new JSZip();
+  const baseName = `De_Kiem_Tra_${config.general.subject}_${config.general.grade.replace(/\s+/g, "_")}`;
+
+  // 1. Export each variant exam & answer
+  for (const variant of shuffleResult.variants) {
+    const examBlob = await generateExamDocxBlob(config, variant.exam);
+    zip.file(`De_Thi_Ma_De_${variant.code}_${baseName}.docx`, examBlob);
+
+    const ansBlob = await generateAnswersDocxBlob(config, variant.answers);
+    zip.file(`Dap_An_Ma_De_${variant.code}_${baseName}.docx`, ansBlob);
+  }
+
+  // 2. Export Comparison Matrix Table
+  const matrixBlob = await generateComparisonMatrixDocxBlob(config, shuffleResult);
+  zip.file(`0_Bang_Soi_Dap_An_4_Ma_De_${baseName}.docx`, matrixBlob);
+
+  // 3. Export Answer Sheet
+  if (shuffleResult.variants[0]) {
+    const sheetBlob = await generateAnswerSheetDocxBlob(config, shuffleResult.variants[0].exam);
+    zip.file(`Phieu_To_Trac_Nghiem_Chuan_Bo_${baseName}.docx`, sheetBlob);
+  }
+
+  const zipBlob = await zip.generateAsync({ type: "blob" });
+  saveAs(zipBlob, `Bo_4_Ma_De_Hoan_Vi_${baseName}.zip`);
 }

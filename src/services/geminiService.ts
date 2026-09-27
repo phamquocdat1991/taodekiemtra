@@ -5,6 +5,9 @@ import {
   ExamData,
   AnswerData,
   DetailGuideData,
+  ExamQuestion,
+  AnswerItem,
+  DetailGuideItem,
 } from "../types";
 import {
   generateSmartMatrix,
@@ -383,4 +386,41 @@ YÊU CẦU ĐẦU RA JSON:
     console.warn("AI Generation failed for Detail Guide, falling back to smart generator:", error);
     return generateSmartDetailGuide(config, exam, answers);
   }
+}
+
+export interface RegenerateQuestionResponse {
+  question: ExamQuestion;
+  answerItem: AnswerItem;
+  detailItem?: DetailGuideItem;
+}
+
+/**
+ * Sinh câu hỏi mới tương đương bằng AI khi giáo viên muốn đổi 1 câu cụ thể
+ */
+export async function regenerateQuestionAI(
+  question: ExamQuestion,
+  subject: string,
+  grade: string,
+  cognitionLevel?: string
+): Promise<RegenerateQuestionResponse> {
+  const customApiKey = getCustomApiKey();
+  const response = await fetch("/api/gemini/regenerate-question", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({
+      question,
+      subject,
+      grade,
+      cognitionLevel: cognitionLevel || "Thông hiểu",
+      customApiKey,
+    }),
+  });
+
+  if (!response.ok) {
+    const errData = await response.json().catch(() => ({}));
+    throw new Error(errData.message || `Lỗi từ máy chủ: ${response.status}`);
+  }
+
+  const data = await response.json();
+  return data.result;
 }
