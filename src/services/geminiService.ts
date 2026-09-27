@@ -1,3 +1,4 @@
+import { GoogleGenAI } from "@google/genai";
 import {
   FullExamState,
   MatrixData,
@@ -63,29 +64,69 @@ function extractAndParseJSON<T>(rawText: string): T {
   }
 }
 
+async function callDirectClientGemini(apiKey: string, prompt: string, systemInstruction?: string): Promise<string> {
+  const ai = new GoogleGenAI({ apiKey });
+  const models = ["gemini-2.5-flash", "gemini-2.0-flash"];
+  let lastErr: any = null;
+  for (const m of models) {
+    try {
+      const resp = await ai.models.generateContent({
+        model: m,
+        contents: prompt,
+        config: {
+          systemInstruction:
+            systemInstruction ||
+            "Bạn là chuyên gia khảo thí, soạn thảo đề kiểm tra theo chuẩn Chương trình GDPT 2018 của Bộ Giáo dục và Đào tạo Việt Nam. Bạn PHẢI trả về duy nhất định dạng JSON chuẩn không kèm bất kỳ giải thích Markdown nào bên ngoài.",
+          responseMimeType: "application/json",
+          temperature: 0.35,
+        },
+      });
+      if (resp.text) return resp.text.trim();
+    } catch (e: any) {
+      lastErr = e;
+      console.warn(`[Client-Side Gemini] Model ${m} gặp sự cố: ${e?.message}, chuyển model tiếp theo...`);
+    }
+  }
+  throw new Error("Lỗi gọi trực tiếp Gemini: " + (lastErr?.message || "Không có phản hồi"));
+}
+
 async function callGeminiApi(prompt: string, systemInstruction?: string): Promise<string> {
   const customApiKey = getCustomApiKey();
-  const response = await fetch("/api/gemini/generate", {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-    },
-    body: JSON.stringify({
-      prompt,
-      systemInstruction:
-        systemInstruction ||
-        "Bạn là chuyên gia khảo thí, soạn thảo đề kiểm tra theo chuẩn Chương trình GDPT 2018 của Bộ Giáo dục và Đào tạo Việt Nam. Bạn PHẢI trả về duy nhất định dạng JSON chuẩn không kèm bất kỳ giải thích Markdown nào bên ngoài.",
-      customApiKey,
-    }),
-  });
+  try {
+    const response = await fetch("/api/gemini/generate", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        prompt,
+        systemInstruction:
+          systemInstruction ||
+          "Bạn là chuyên gia khảo thí, soạn thảo đề kiểm tra theo chuẩn Chương trình GDPT 2018 của Bộ Giáo dục và Đào tạo Việt Nam. Bạn PHẢI trả về duy nhất định dạng JSON chuẩn không kèm bất kỳ giải thích Markdown nào bên ngoài.",
+        customApiKey,
+      }),
+    });
 
-  if (!response.ok) {
+    if (response.ok) {
+      const data = await response.json();
+      return data.result;
+    }
+
     const errData = await response.json().catch(() => ({}));
-    throw new Error(errData.message || `Lỗi từ máy chủ: ${response.status}`);
-  }
+    const errMsg = errData.message || `Lỗi từ máy chủ: ${response.status}`;
 
-  const data = await response.json();
-  return data.result;
+    if (customApiKey && (response.status === 404 || response.status >= 500 || errData.error === "NO_API_KEY")) {
+      console.warn("Máy chủ không phản hồi hoặc thiếu key, chuyển sang gọi trực tiếp Gemini từ trình duyệt...");
+      return await callDirectClientGemini(customApiKey, prompt, systemInstruction);
+    }
+    throw new Error(errMsg);
+  } catch (err: any) {
+    if (customApiKey) {
+      console.warn("Kết nối máy chủ bị lỗi, tự động chuyển sang gọi trực tiếp Gemini từ trình duyệt...", err);
+      return await callDirectClientGemini(customApiKey, prompt, systemInstruction);
+    }
+    throw err;
+  }
 }
 
 // STEP 1: GENERATE MATRIX
@@ -404,23 +445,79 @@ export async function regenerateQuestionAI(
   cognitionLevel?: string
 ): Promise<RegenerateQuestionResponse> {
   const customApiKey = getCustomApiKey();
-  const response = await fetch("/api/gemini/regenerate-question", {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({
-      question,
-      subject,
-      grade,
-      cognitionLevel: cognitionLevel || "Thông hiểu",
-      customApiKey,
-    }),
-  });
+  const fallbackPrompt = `
+Bạn là chuyên gia khảo thí Việt Nam. Hãy tạo 1 câu hỏi MỚI TƯƠNG ĐƯƠNG hoàn toàn với câu hỏi sau về đơn vị kiến thức, độ khó và dạng thức, nhưng ĐỔI SỐ LIỆU hoặc NGỮ LIỆU để giáo viên thay thế vào đề thi:
+- Môn học: ${subject || "Môn học"} - Lớp: ${grade || "Lớp"}
+- Mức độ nhận thức: ${cognitionLevel || "Thông hiểu"}
+- Câu hỏi gốc: ${JSON.stringify(question)}
 
-  if (!response.ok) {
-    const errData = await response.json().catch(() => ({}));
-    throw new Error(errData.message || `Lỗi từ máy chủ: ${response.status}`);
+Yêu cầu xuất ra JSON chuẩn:
+{
+  "question": {
+    "id": "${question.id || "q_new"}",
+    "questionNumber": "${question.questionNumber || 1}",
+    "type": "${question.type || "multipleChoice"}",
+    "content": "Nội dung câu hỏi mới...",
+    "passage": "${question.passage ? "Đoạn trích mới nếu có..." : ""}",
+    "options": [
+      { "key": "A", "text": "Phương án A mới" },
+      { "key": "B", "text": "Phương án B mới" },
+      { "key": "C", "text": "Phương án C mới" },
+      { "key": "D", "text": "Phương án D mới" }
+    ],
+    "subQuestions": ${question.subQuestions ? `[
+      { "label": "a)", "text": "Ý a mới" },
+      { "label": "b)", "text": "Ý b mới" },
+      { "label": "c)", "text": "Ý c mới" },
+      { "label": "d)", "text": "Ý d mới" }
+    ]` : "null"},
+    "points": ${question.points || 0.25}
+  },
+  "answerItem": {
+    "questionNumber": "${question.questionNumber || 1}",
+    "solutionSummary": "Đáp án đúng (VD: B hoặc bảng Đúng/Sai)",
+    "points": ${question.points || 0.25}
+  },
+  "detailItem": {
+    "questionNumber": "${question.questionNumber || 1}",
+    "questionExcerpt": "Tóm tắt câu hỏi",
+    "answer": "Đáp án đúng",
+    "detailedSolution": "Lời giải chi tiết từng bước",
+    "knowledgeUsed": "Đơn vị kiến thức áp dụng",
+    "trapAnalysis": "Bẫy tư duy học sinh hay mắc phải"
   }
+}
+`;
 
-  const data = await response.json();
-  return data.result;
+  try {
+    const response = await fetch("/api/gemini/regenerate-question", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        question,
+        subject,
+        grade,
+        cognitionLevel: cognitionLevel || "Thông hiểu",
+        customApiKey,
+      }),
+    });
+
+    if (response.ok) {
+      const data = await response.json();
+      return data.result;
+    }
+
+    const errData = await response.json().catch(() => ({}));
+    if (customApiKey && (response.status === 404 || response.status >= 500 || errData.error === "NO_API_KEY")) {
+      const text = await callDirectClientGemini(customApiKey, fallbackPrompt);
+      return extractAndParseJSON<RegenerateQuestionResponse>(text);
+    }
+    throw new Error(errData.message || `Lỗi từ máy chủ: ${response.status}`);
+  } catch (err: any) {
+    if (customApiKey) {
+      const text = await callDirectClientGemini(customApiKey, fallbackPrompt);
+      return extractAndParseJSON<RegenerateQuestionResponse>(text);
+    }
+    throw err;
+  }
 }
