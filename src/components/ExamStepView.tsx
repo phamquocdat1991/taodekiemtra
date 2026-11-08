@@ -54,6 +54,11 @@ export const ExamStepView: React.FC<ExamStepViewProps> = ({
   const currentVariant = shuffledResult?.variants.find((v) => v.code === activeCode);
   const displayExam = currentVariant ? currentVariant.exam : exam;
 
+  // Check if exam has multiple choice questions
+  const hasMultipleChoiceQuestions = displayExam.parts.some((p) =>
+    p.questions.some((q) => q.type === "multipleChoice" || q.type === "trueFalse")
+  );
+
   // Export Answer Sheet
   const handleExportAnswerSheet = async () => {
     try {
@@ -150,16 +155,23 @@ export const ExamStepView: React.FC<ExamStepViewProps> = ({
             </>
           )}
 
-          {/* Export Answer Sheet */}
-          <button
-            type="button"
-            onClick={handleExportAnswerSheet}
-            className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-bold bg-white text-stone-700 hover:bg-stone-50 border border-stone-200 transition-all shadow-2xs cursor-pointer active:scale-95"
-            title="Xuất file Word phiếu tô trắc nghiệm chuẩn Bộ GD&ĐT"
-          >
-            <Printer className="w-3.5 h-3.5 text-stone-500" />
-            <span>Phiếu Tô Trắc Nghiệm (.docx)</span>
-          </button>
+          {/* Export Answer Sheet (chỉ hiển thị nếu đề có câu trắc nghiệm) */}
+          {hasMultipleChoiceQuestions ? (
+            <button
+              type="button"
+              onClick={handleExportAnswerSheet}
+              className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-bold bg-white text-stone-700 hover:bg-stone-50 border border-stone-200 transition-all shadow-2xs cursor-pointer active:scale-95"
+              title="Xuất file Word phiếu tô trắc nghiệm chuẩn Bộ GD&ĐT"
+            >
+              <Printer className="w-3.5 h-3.5 text-stone-500" />
+              <span>Phiếu Tô Trắc Nghiệm (.docx)</span>
+            </button>
+          ) : (
+            <span className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-bold bg-orange-50 text-[#8F310C] border border-orange-200 shadow-2xs">
+              <CheckCircle2 className="w-3.5 h-3.5 text-[#F5730B]" />
+              <span>Đề thi 100% Tự luận</span>
+            </span>
+          )}
         </div>
       </div>
 

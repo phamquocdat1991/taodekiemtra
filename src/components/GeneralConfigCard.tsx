@@ -519,6 +519,16 @@ export const GeneralConfigCard: React.FC<GeneralConfigCardProps> = ({
           </div>
         </div>
 
+        {/* Thông báo cam kết khi NB = 0 */}
+        {Number(cognition.nb || 0) === 0 && (
+          <div className="mt-3 p-2.5 rounded-lg bg-blue-50/80 border border-blue-200 text-xs text-blue-800 flex items-center gap-2 font-medium">
+            <CheckCircle2 className="w-4 h-4 text-blue-600 shrink-0" />
+            <span>
+              <strong>Cam kết Nhận biết (NB) = 0%:</strong> Ma trận, bản đặc tả và đề thi sẽ không có bất kỳ câu hỏi nhận biết nào, dồn 100% trọng tâm vào Thông hiểu, Vận dụng và Vận dụng cao.
+            </span>
+          </div>
+        )}
+
         {!isCognitionValid && (
           <div className="mt-2.5 text-xs text-red-600 flex items-center gap-1.5 font-semibold">
             <AlertCircle className="w-3.5 h-3.5 shrink-0" />

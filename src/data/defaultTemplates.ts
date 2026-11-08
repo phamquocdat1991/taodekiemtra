@@ -163,4 +163,46 @@ export const defaultPresets: DefaultPresetItem[] = [
       },
     },
   },
+  {
+    id: "preset-toan-10-tuan-luan",
+    name: "Toán 10 - Đề 100% Tự luận (Phân hóa cao - Không nhận biết)",
+    state: {
+      ...initialFullExamState,
+      general: {
+        department: "SỞ GIÁO DỤC VÀ ĐÀO TẠO",
+        schoolName: "TRƯỜNG THPT CHU VĂN AN",
+        examType: "Giữa kì 1",
+        educationLevel: "Cấp 3 (THPT)",
+        grade: "Lớp 10",
+        subject: "Toán",
+        textbook: "Kết nối tri thức với cuộc sống",
+        duration: 90,
+      },
+      cognition: {
+        nb: 0,
+        th: 40,
+        vd: 40,
+        vdc: 20,
+        difficulty: "Khá",
+      },
+      knowledge: {
+        content: "Chương 1: Mệnh đề và tập hợp.\nChương 2: Bất phương trình và hệ bất phương trình bậc nhất hai ẩn.\nChương 3: Hệ thức lượng trong tam giác và bài toán thực tế.",
+        attachmentName: null,
+        attachmentSize: null,
+        attachmentContent: null,
+        additionalRequirements: "Đề thi hoàn toàn bằng hình thức tự luận, gồm 5 bài toán lớn, phân hóa từ thông hiểu đến vận dụng cao, có 1 bài toán thực tế đo đạc khoảng cách tam giác.",
+      },
+      structure: {
+        type: "standard",
+        standard: {
+          multipleChoice: { count: 0, percent: 0, points: 0 },
+          trueFalse: { count: 0, percent: 0, points: 0 },
+          shortAnswer: { count: 0, percent: 0, points: 0 },
+          essay: { count: 5, percent: 100, points: 10.0 },
+        },
+        language: initialFullExamState.structure.language,
+        literature: initialFullExamState.structure.literature,
+      },
+    },
+  },
 ];

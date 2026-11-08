@@ -5,7 +5,7 @@ import {
   LanguageQuestionStructure,
   LiteratureQuestionStructure,
 } from "../types";
-import { ListFilter, RotateCcw, AlertCircle, CheckCircle2 } from "lucide-react";
+import { ListFilter, RotateCcw, AlertCircle, CheckCircle2, Sparkles, PenTool } from "lucide-react";
 
 // ─── Score Progress Bar Component ────────────────────────────────────────────
 interface ScoreProgressBarProps {
@@ -151,6 +151,54 @@ export const StructureCard: React.FC<StructureCardProps> = ({
 
   const isStdValid = stdTotalPercent === 100 && stdTotalPoints === 10.0;
 
+  const isPureEssay =
+    !isLanguage &&
+    !isLiterature &&
+    std.multipleChoice.count === 0 &&
+    std.trueFalse.count === 0 &&
+    std.shortAnswer.count === 0 &&
+    std.essay.count > 0;
+
+  const handleApplyPreset = (presetType: "gdpt2018" | "tn70_tl30" | "tn50_tl50" | "pure_essay") => {
+    if (presetType === "gdpt2018") {
+      onChange({
+        standard: {
+          multipleChoice: { count: 12, percent: 30, points: 3.0 },
+          trueFalse: { count: 4, percent: 40, points: 4.0 },
+          shortAnswer: { count: 6, percent: 30, points: 3.0 },
+          essay: { count: 0, percent: 0, points: 0 },
+        },
+      });
+    } else if (presetType === "tn70_tl30") {
+      onChange({
+        standard: {
+          multipleChoice: { count: 28, percent: 70, points: 7.0 },
+          trueFalse: { count: 0, percent: 0, points: 0 },
+          shortAnswer: { count: 0, percent: 0, points: 0 },
+          essay: { count: 3, percent: 30, points: 3.0 },
+        },
+      });
+    } else if (presetType === "tn50_tl50") {
+      onChange({
+        standard: {
+          multipleChoice: { count: 20, percent: 50, points: 5.0 },
+          trueFalse: { count: 0, percent: 0, points: 0 },
+          shortAnswer: { count: 0, percent: 0, points: 0 },
+          essay: { count: 5, percent: 50, points: 5.0 },
+        },
+      });
+    } else if (presetType === "pure_essay") {
+      onChange({
+        standard: {
+          multipleChoice: { count: 0, percent: 0, points: 0 },
+          trueFalse: { count: 0, percent: 0, points: 0 },
+          shortAnswer: { count: 0, percent: 0, points: 0 },
+          essay: { count: 5, percent: 100, points: 10.0 },
+        },
+      });
+    }
+  };
+
   const handleStdRowChange = (
     key: keyof StandardQuestionStructure,
     field: "count" | "percent" | "points",
@@ -277,6 +325,70 @@ export const StructureCard: React.FC<StructureCardProps> = ({
       {/* CASE A: MÔN THÔNG THƯỜNG (TOÁN, LÍ, HÓA, SINH, KHTN, SỬ, ĐỊA, TIN,...) */}
       {!isLanguage && !isLiterature && (
         <div>
+          {/* Quick Preset Buttons */}
+          <div className="mb-4 p-3 bg-[#FAF8F5] rounded-xl border border-[#EFE7DF]">
+            <div className="flex items-center gap-1.5 mb-2.5">
+              <Sparkles className="w-4 h-4 text-[#F5730B]" />
+              <span className="text-xs font-extrabold text-[#431805] uppercase tracking-wide">
+                Chọn nhanh cấu trúc đề thi định sẵn:
+              </span>
+            </div>
+            <div className="flex flex-wrap gap-2">
+              <button
+                type="button"
+                onClick={() => handleApplyPreset("gdpt2018")}
+                className="px-2.5 py-1.5 rounded-lg text-xs font-bold bg-white text-stone-700 border border-stone-200 hover:border-orange-300 hover:bg-orange-50/50 transition-all active:scale-95 shadow-2xs"
+                title="12 câu TN (3đ) + 4 câu Đ/S (4đ) + 6 câu Trả lời ngắn (3đ)"
+              >
+                Chuẩn Bộ GD&ĐT (3-4-3)
+              </button>
+              <button
+                type="button"
+                onClick={() => handleApplyPreset("tn70_tl30")}
+                className="px-2.5 py-1.5 rounded-lg text-xs font-bold bg-white text-stone-700 border border-stone-200 hover:border-orange-300 hover:bg-orange-50/50 transition-all active:scale-95 shadow-2xs"
+                title="28 câu TN (7đ) + 3 câu Tự luận (3đ)"
+              >
+                70% Trắc nghiệm + 30% Tự luận
+              </button>
+              <button
+                type="button"
+                onClick={() => handleApplyPreset("tn50_tl50")}
+                className="px-2.5 py-1.5 rounded-lg text-xs font-bold bg-white text-stone-700 border border-stone-200 hover:border-orange-300 hover:bg-orange-50/50 transition-all active:scale-95 shadow-2xs"
+                title="20 câu TN (5đ) + 5 câu Tự luận (5đ)"
+              >
+                50% Trắc nghiệm + 50% Tự luận
+              </button>
+              <button
+                type="button"
+                onClick={() => handleApplyPreset("pure_essay")}
+                className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-extrabold transition-all active:scale-95 shadow-2xs cursor-pointer ${
+                  isPureEssay
+                    ? "bg-[#F5730B] text-white border border-[#F5730B] shadow-xs"
+                    : "bg-orange-100 text-[#8F310C] border border-orange-300 hover:bg-orange-200"
+                }`}
+                title="0 câu trắc nghiệm + 5 câu Tự luận (10 điểm)"
+              >
+                <PenTool className="w-3.5 h-3.5" />
+                <span>100% TỰ LUẬN (Đề tự luận hoàn toàn)</span>
+              </button>
+            </div>
+          </div>
+
+          {/* Banner thông báo nếu đang ở chế độ 100% tự luận */}
+          {isPureEssay && (
+            <div className="mb-4 p-3 bg-emerald-50 rounded-xl border-2 border-emerald-300 text-xs text-emerald-800 flex items-start gap-2.5 shadow-2xs">
+              <CheckCircle2 className="w-4 h-4 text-emerald-600 shrink-0 mt-0.5" />
+              <div>
+                <p className="font-extrabold text-emerald-900">
+                  Đang kích hoạt chế độ: Đề thi 100% TỰ LUẬN
+                </p>
+                <p className="text-emerald-700 font-medium mt-0.5">
+                  Hệ thống cam kết ma trận, bản đặc tả và đề thi sẽ chỉ gồm các bài toán/câu hỏi tự luận có barem chi tiết, tuyệt đối KHÔNG xuất hiện bất kỳ câu hỏi trắc nghiệm nào.
+                </p>
+              </div>
+            </div>
+          )}
+
           <div className="overflow-x-auto">
             <table className="w-full text-left text-xs md:text-sm">
               <thead>
